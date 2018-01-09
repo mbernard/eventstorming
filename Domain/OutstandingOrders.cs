@@ -35,5 +35,10 @@ namespace Domain
         {
             this.Orders.Remove(orderPrepared.OrderId);
         }
+
+        public void Apply(OrderCanceled orderCanceled)
+        {
+            
+        }
     }
 }
