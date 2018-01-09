@@ -7,6 +7,10 @@ namespace Domain
 {
     public class Order : IAggregate
     {
+        public Order()
+        {
+        }
+
         public Order(string id)
         {
             this.Id = id;
