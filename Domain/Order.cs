@@ -14,7 +14,16 @@ namespace Domain
         {
             if (order is CancelOrder)
                 return this.CancelOrder((CancelOrder) order);
+            if (order is StartFoodPreparation)
+            {
+                return StartFoodPreparation((StartFoodPreparation) order);
+            }
             throw new InvalidOperationException("Unknown command.");
+        }
+
+        private IEnumerable<object> StartFoodPreparation(StartFoodPreparation order)
+        {
+            return new[] {new OrderStarted()};
         }
 
         private IEnumerable<object> CancelOrder(CancelOrder cancelOrder)
@@ -104,6 +113,14 @@ namespace Domain
     }
 
     public class OrderPickedUp
+    {
+    }
+
+    public class OrderStarted
+    {
+    }
+
+    public class StartFoodPreparation
     {
     }
 }

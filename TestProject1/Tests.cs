@@ -79,7 +79,11 @@ namespace TestProject1
         {
             var order = new Order();
             order.Hydrate(new OrderSubmitted());
-            
+
+            var events = order.Execute(new StartFoodPreparation());
+
+            Assert.True(events.Count() == 1);
+            Assert.True(events.First() is OrderStarted);
         }
     }
 }
