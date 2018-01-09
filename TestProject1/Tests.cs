@@ -16,7 +16,7 @@ namespace TestProject1
         {
             //Given
             var order = new Order();
-            order.Hydrate(new OrderReceived());
+            order.Hydrate(new OrderSubmitted());
 
             //When
             var events = order.Execute(new CancelOrder("1"));
@@ -68,10 +68,18 @@ namespace TestProject1
         public void CannotCancelPickedUpOrder()
         {
             var order = new Order();
-            order.Hydrate(new OrderReceived());
+            order.Hydrate(new OrderSubmitted());
             order.Hydrate(new OrderPickedUp());
 
             Assert.Catch<Exception>(() => order.Execute(new CancelOrder("1")));
+        }
+
+        [Test]
+        public void StartFoodPrep()
+        {
+            var order = new Order();
+            order.Hydrate(new OrderSubmitted());
+            
         }
     }
 }
