@@ -199,6 +199,7 @@ namespace Domain
 
     public class OrderStarted
     {
+        public string OrderId { get; set; }
     }
 
     public class OrderCreated

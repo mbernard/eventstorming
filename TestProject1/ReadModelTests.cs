@@ -32,6 +32,23 @@ namespace TestProject1
             Assert.True(firstOrderItems.First() == "Chicken Wings");
             Assert.True(firstOrderItems.ElementAt(1) == "Poutine");
         }
+
+        [Test]
+        public void StartOrderChangeOustandingOrderToStarted()
+        {
+            // Given
+            var outstandingOrders = new OutstandingOrders();
+            outstandingOrders.Apply(new ItemAddedToOrder { OrderId = "3", Name = "Hamburger", Price = 5 });
+            outstandingOrders.Apply(new ItemAddedToOrder { OrderId = "3", Name = "Pizza", Price = 5 });
+            outstandingOrders.Apply(new OrderSubmitted { OrderId = "3" });
+            outstandingOrders.Apply(new ItemAddedToOrder { OrderId = "5", Name = "Chicken Wings", Price = 10 });
+            outstandingOrders.Apply(new OrderSubmitted { OrderId = "5" });
+            outstandingOrders.Apply(new OrderStarted() { OrderId = "5" });
+
+            // When
+            // Then
+            Assert.AreEqual(OrderStatus.Started, outstandingOrders._orders["5"].Status);
+        }
         
     }
 }
