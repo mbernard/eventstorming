@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 using Infra;
 
@@ -12,6 +10,7 @@ namespace Domain
         private string orderId;
         private bool received;
         private bool pickedUp;
+        private OrderStatus Status;
 
         public IEnumerable<object> Execute(object order)
         {
@@ -20,7 +19,13 @@ namespace Domain
             if (order is SubmitOrder)
                 return this.SubmitOrder((SubmitOrder)order);
             if (order is CancelOrder)
-                return this.CancelOrder((CancelOrder) order);
+            {
+                return CancelOrder((CancelOrder) order);
+            }
+            if (order is FinishOrder)
+            {
+                //return FinishOrder((FinishOrder) order);
+            }
             if (order is StartFoodPreparation)
             {
                 return StartFoodPreparation((StartFoodPreparation) order);
@@ -40,17 +45,19 @@ namespace Domain
 
         private IEnumerable<object> CancelOrder(CancelOrder cancelOrder)
         {
-            if (!this.received)
+            switch (Status)
             {
-                throw new OrderNotReceivedException("Order not received.");
+                case OrderStatus.Submitted:
+                case OrderStatus.Started:
+                case OrderStatus.Prepared:
+                    return new[] { new OrderCanceled() };
+                case OrderStatus.PickedUp:
+                    throw new Exception("Cannot cancel pickedup order");
+                case OrderStatus.Delivered:
+                    throw new Exception("Cannot cancel delivered order");
+                default:
+                    throw new OrderNotSubmittedException("Order not submitted.");
             }
-
-            if (pickedUp)
-            {
-                throw new Exception("Cannot cancel pickedup order");
-            }
-
-            return new[] {new OrderCanceled()};
         }
 
         private IEnumerable<object> SubmitOrder(SubmitOrder submitOrder)
@@ -68,9 +75,9 @@ namespace Domain
             if (@event is OrderCreated)
                 this.OnOrderCreated((OrderCreated)@event);
             if (@event is OrderSubmitted)
-                this.OnOrderReceived((OrderSubmitted) @event);
+                OnOrderSubmitted((OrderSubmitted) @event);
             if (@event is OrderPickedUp)
-                this.OnOrderPickedUp((OrderPickedUp)@event);
+                OnOrderPickedUp((OrderPickedUp) @event);
         }
 
         private void OnOrderCreated(OrderCreated @event)
@@ -80,12 +87,12 @@ namespace Domain
 
         private void OnOrderPickedUp(OrderPickedUp @event)
         {
-            pickedUp = true;
+            this.Status = OrderStatus.PickedUp;
         }
 
-        private void OnOrderReceived(OrderSubmitted @event)
+        private void OnOrderSubmitted(OrderSubmitted @event)
         {
-            this.received = true;
+            this.Status = OrderStatus.Submitted;
         }
     }
 
@@ -96,42 +103,45 @@ namespace Domain
     public enum OrderStatus
     {
         Submitted,
-        Received,
         Started,
         Prepared,
-        InTransit,
+        PickedUp,
         Delivered
     }
 
     public class GetOrderStatus
     {
-        public void Apply(OrderSubmitted orderSubmitted)
-        {
-            this.Status = OrderStatus.Submitted;
-        }
 
         public OrderStatus Status { get; set; }
 
+        public void Apply(OrderSubmitted orderSubmitted)
+        {
+            Status = OrderStatus.Submitted;
+        }
+
         public void Apply(OrderStarted orderStarted)
         {
-            this.Status = OrderStatus.Started;
+            Status = OrderStatus.Started;
         }
 
         public void Apply(OrderPrepared orderPrepared)
         {
-            this.Status = OrderStatus.Prepared;
+            Status = OrderStatus.Prepared;
         }
 
         public void Apply(OrderPickedUp orderPickedUp)
         {
-            this.Status = OrderStatus.InTransit;
+            Status = OrderStatus.PickedUp;
         }
 
         public void Apply(FoodDelivered foodDelivered)
         {
-            this.Status = OrderStatus.Delivered;
-
+            Status = OrderStatus.Delivered;
         }
+    }
+
+    public class OrderStarted
+    {
     }
 
     public class OrderCreated
@@ -164,30 +174,27 @@ namespace Domain
 
         public void Apply(ItemAddedToOrder itemAddedToOrder)
         {
-            this.Items.Add((itemAddedToOrder.Name, itemAddedToOrder.Price));
-            this.TotalPrice += itemAddedToOrder.Price;
+            Items.Add((itemAddedToOrder.Name, itemAddedToOrder.Price));
+            TotalPrice += itemAddedToOrder.Price;
         }
 
         public void Apply(OrderSubmitted orderSubmitted)
         {
-            this.OrderDate = orderSubmitted.Date;
+            OrderDate = orderSubmitted.Date;
         }
     }
 
     public class OrderCanceled
     {
     }
-
-    public class OrderStarted
+    
+    public class FinishOrder
     {
-        public OrderStarted()
-        {
-        }
     }
 
-    public class OrderNotReceivedException : Exception
+    public class OrderNotSubmittedException : Exception
     {
-        public OrderNotReceivedException(string message) : base(message)
+        public OrderNotSubmittedException(string message) : base(message)
         { }
     }
 
@@ -205,7 +212,7 @@ namespace Domain
     {
         public CancelOrder(string orderId)
         {
-            this.OrderId = orderId;
+            OrderId = orderId;
         }
 
         public string OrderId { get; }
