@@ -206,12 +206,36 @@ namespace TestProject1
             order.Hydrate(new OrderPickedUp());
             
             // When
-            //var events = order.Execute(new ConfirmDelivery());
+            var events = order.Execute(new ConfirmDelivery());
 
             // Then
-            //Assert.True(events.Count() == 1);
-            //Assert.True(events.First() is FoodDelivered);
-            //TODO
+            Assert.True(events.Count() == 1);
+            Assert.True(events.First() is FoodDelivered);
+        }
+
+        [Test]
+        public void OrderCreated()
+        {
+            var order = new Order();
+
+            var events = order.Execute(new CreateOrder("1"));
+
+            Assert.True(events.Count() == 1);
+            Assert.True(events.First() is OrderCreated);
+        }
+
+        [Test]
+        public void AddItem()
+        {
+            var order = new Order();
+            order.Hydrate(new OrderCreated("1"));
+
+            var events = order.Execute(new AddItemToOrder("Potato", 15.00M));
+
+            Assert.True(events.Count() == 1);
+            Assert.True(events.First() is ItemAddedToOrder);
+            Assert.True(((ItemAddedToOrder)events.First()).Name == "Potato");
+            Assert.True(((ItemAddedToOrder)events.First()).Price == 15.00M);
         }
     }
 }

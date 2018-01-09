@@ -11,11 +11,6 @@ namespace Domain
         {
         }
 
-        public Order(string id)
-        {
-            this.Id = id;
-        }
-
         private bool received;
         private bool pickedUp;
         private OrderStatus Status;
@@ -39,7 +34,27 @@ namespace Domain
                 return PickUpOrder((PickUpOrderForDelivery) order);
             }
 
+            if (order is ConfirmDelivery)
+                return ConfirmDelivery((ConfirmDelivery) order);
+
+            if (order is AddItemToOrder)
+            {
+                return AddItem((AddItemToOrder) order);
+            }
+
             throw new InvalidOperationException("Unknown command.");
+        }
+
+        private IEnumerable<object> AddItem(AddItemToOrder order)
+        {
+            return new[]
+            {
+                new ItemAddedToOrder
+                {
+                    Name = order.Name,
+                    Price = order.Price
+                }
+            };
         }
 
         private IEnumerable<object> CreateOrder(CreateOrder createOrder)
@@ -90,6 +105,14 @@ namespace Domain
             return new[]
             {
                 new OrderSubmitted()
+            };
+        }
+
+        private IEnumerable<object> ConfirmDelivery(ConfirmDelivery confirmDelivery)
+        {
+            return new[]
+            {
+                new FoodDelivered()
             };
         }
 
@@ -254,5 +277,20 @@ namespace Domain
     }
     public class PickUpOrderForDelivery
     {
+    }
+
+    public class ConfirmDelivery
+    {
+
+    public class AddItemToOrder
+    {
+        public string Name { get; }
+        public decimal Price { get; }
+
+        public AddItemToOrder(string name, decimal price)
+        {
+            Name = name;
+            Price = price;
+        }
     }
 }
