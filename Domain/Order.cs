@@ -118,7 +118,7 @@ namespace Domain
         {
             return new[]
             {
-                new FoodDelivered()
+                new OrderDelivered()
             };
         }
 
@@ -170,12 +170,14 @@ namespace Domain
 
     public enum OrderStatus
     {
-        None,
-        Submitted,
-        Started,
-        Prepared,
-        PickedUp,
-        Delivered
+        None = 0,
+        Submitted = 1,
+        Started = 2,
+        Prepared = 3,
+        ReadyForPickup = Prepared,
+        PickedUp = 4,
+        InTransit = PickedUp,
+        Delivered = 5
     }
 
     public class GetOrderStatus
@@ -203,7 +205,7 @@ namespace Domain
             Status = OrderStatus.PickedUp;
         }
 
-        public void Apply(FoodDelivered foodDelivered)
+        public void Apply(OrderDelivered orderDelivered)
         {
             Status = OrderStatus.Delivered;
         }
@@ -224,9 +226,9 @@ namespace Domain
         }
     }
 
-    public class FoodDelivered
+    public class OrderDelivered
     {
-
+        public string OrderId { get; set; }
     }
 
     public class OrderPrepared
@@ -273,8 +275,8 @@ namespace Domain
     public class OrderSubmitted
     {
         public string OrderId { get; set; }
-
         public DateTime Date { get; set; }
+        public string Address { get; set; }
     }
 
     public class ItemAddedToOrder
@@ -286,6 +288,7 @@ namespace Domain
 
     public class OrderPickedUp
     {
+        public string OrderId { get; set; }
     }
 
     public class StartFoodPreparation
