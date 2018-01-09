@@ -7,10 +7,19 @@ namespace Domain
 {
     public class Order : IAggregate
     {
-        private string orderId;
+        public Order()
+        {
+        }
+
+        public Order(string id)
+        {
+            this.Id = id;
+        }
+
         private bool received;
         private bool pickedUp;
         private OrderStatus Status;
+        private string OrderId;
 
         public IEnumerable<object> Execute(object order)
         {
@@ -19,17 +28,17 @@ namespace Domain
             if (order is SubmitOrder)
                 return this.SubmitOrder((SubmitOrder)order);
             if (order is CancelOrder)
-            {
                 return CancelOrder((CancelOrder) order);
-            }
             if (order is FinishOrder)
-            {
-                //return FinishOrder((FinishOrder) order);
-            }
+                return FinishOrder((FinishOrder) order);
             if (order is StartFoodPreparation)
-            {
                 return StartFoodPreparation((StartFoodPreparation) order);
+
+            if (order is PickUpOrderForDelivery)
+            {
+                return PickUpOrder((PickUpOrderForDelivery) order);
             }
+
             throw new InvalidOperationException("Unknown command.");
         }
 
@@ -37,20 +46,36 @@ namespace Domain
         {
             return new[] { new OrderCreated(createOrder.OrderId) };
         }
+        
+        private IEnumerable<object> PickUpOrder(PickUpOrderForDelivery order)
+        {
+            return new[] {new OrderPickedUp()};
+        }
 
         private IEnumerable<object> StartFoodPreparation(StartFoodPreparation order)
         {
             return new[] {new OrderStarted()};
         }
 
+        private IEnumerable<object> FinishOrder(FinishOrder finishOrder)
+        {
+            if (Status == OrderStatus.Started)
+                return new[] {new OrderPrepared()};
+
+            throw new InvalidOperationException("Cannot finish an unstarted order");
+        }
+
+
         private IEnumerable<object> CancelOrder(CancelOrder cancelOrder)
         {
             switch (Status)
             {
+                case OrderStatus.None:
+                    throw new OrderNotSubmittedException("Order not submitted.");
                 case OrderStatus.Submitted:
                 case OrderStatus.Started:
                 case OrderStatus.Prepared:
-                    return new[] { new OrderCanceled() };
+                    return new[] {new OrderCanceled()};
                 case OrderStatus.PickedUp:
                     throw new Exception("Cannot cancel pickedup order");
                 case OrderStatus.Delivered:
@@ -76,23 +101,30 @@ namespace Domain
                 this.OnOrderCreated((OrderCreated)@event);
             if (@event is OrderSubmitted)
                 OnOrderSubmitted((OrderSubmitted) @event);
+            if (@event is OrderStarted)
+                OnOrderStarted((OrderStarted) @event);
             if (@event is OrderPickedUp)
                 OnOrderPickedUp((OrderPickedUp) @event);
         }
 
         private void OnOrderCreated(OrderCreated @event)
         {
-            orderId = @event.OrderId;
+            this.OrderId = @event.OrderId;
+        }
+
+        private void OnOrderStarted(OrderStarted @event)
+        {
+            Status = OrderStatus.Started;
         }
 
         private void OnOrderPickedUp(OrderPickedUp @event)
         {
-            this.Status = OrderStatus.PickedUp;
+            Status = OrderStatus.PickedUp;
         }
 
         private void OnOrderSubmitted(OrderSubmitted @event)
         {
-            this.Status = OrderStatus.Submitted;
+            Status = OrderStatus.Submitted;
         }
     }
 
@@ -102,6 +134,7 @@ namespace Domain
 
     public enum OrderStatus
     {
+        None,
         Submitted,
         Started,
         Prepared,
@@ -163,27 +196,6 @@ namespace Domain
     {
     }
 
-    public class OrderPerUser
-    {
-        public DateTime OrderDate { get; set; }
-
-        public decimal TotalPrice { get; set; }
-
-        public IList<(string Name, decimal Price)> Items { get; set; } = new List<(string, decimal)>();
-
-
-        public void Apply(ItemAddedToOrder itemAddedToOrder)
-        {
-            Items.Add((itemAddedToOrder.Name, itemAddedToOrder.Price));
-            TotalPrice += itemAddedToOrder.Price;
-        }
-
-        public void Apply(OrderSubmitted orderSubmitted)
-        {
-            OrderDate = orderSubmitted.Date;
-        }
-    }
-
     public class OrderCanceled
     {
     }
@@ -234,6 +246,9 @@ namespace Domain
     }
 
     public class StartFoodPreparation
+    {
+    }
+    public class PickUpOrderForDelivery
     {
     }
 }

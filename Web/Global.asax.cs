@@ -14,7 +14,11 @@ namespace Web
 {
     public class MvcApplication : System.Web.HttpApplication
     {
-        public static readonly CommandExecutor CommandExecutor = new CommandExecutor(Enumerable.Empty<Action<object>>());
+        public static readonly OrderPerUserRepository OrderPerUserRepository = new OrderPerUserRepository();
+        public static readonly CommandExecutor CommandExecutor = new CommandExecutor(new[]
+        {
+            EventHandlers.OnOrderCreatedEventHandler(OrderPerUserRepository)
+        });
 
         static MvcApplication()
         {
