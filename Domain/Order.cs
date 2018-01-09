@@ -279,6 +279,7 @@ namespace Domain
 
     public class ConfirmDelivery
     {
+    }
 
     public class AddItemToOrder
     {
