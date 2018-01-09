@@ -22,7 +22,7 @@ namespace Domain
             this.TotalPrice += itemAddedToOrder.Price;
         }
 
-        public void Apply(OrderSubmitted orderSubmitted)
+        public void Apply(OrderSubmitted_V2 orderSubmitted)
         {
             this.OrderDate = orderSubmitted.Date;
         }

@@ -146,9 +146,9 @@ namespace TestProject1
             var outstandingOrders = new OutstandingOrders();
             outstandingOrders.Apply(new ItemAddedToOrder { OrderId = "3", Name = "Hamburger", Price = 5 });
             outstandingOrders.Apply(new ItemAddedToOrder { OrderId = "3", Name = "Pizza", Price = 5 });
-            outstandingOrders.Apply(new OrderSubmitted { OrderId = "3" });
+            outstandingOrders.Apply(new OrderSubmitted_V2 { OrderId = "3" });
             outstandingOrders.Apply(new ItemAddedToOrder { OrderId = "5", Name = "Chicken Wings", Price = 10 });
-            outstandingOrders.Apply(new OrderSubmitted{ OrderId = "5" });
+            outstandingOrders.Apply(new OrderSubmitted_V2 { OrderId = "5" });
             outstandingOrders.Apply(new OrderPrepared{ OrderId = "5" });
 
             // When
@@ -164,9 +164,9 @@ namespace TestProject1
             var outstandingOrders = new OutstandingOrders();
             outstandingOrders.Apply(new ItemAddedToOrder { OrderId = "3", Name = "Hamburger", Price = 5 });
             outstandingOrders.Apply(new ItemAddedToOrder { OrderId = "3", Name = "Pizza", Price = 5 });
-            outstandingOrders.Apply(new OrderSubmitted { OrderId = "3" });
+            outstandingOrders.Apply(new OrderSubmitted_V2 { OrderId = "3" });
             outstandingOrders.Apply(new ItemAddedToOrder { OrderId = "5", Name = "Chicken Wings", Price = 10 });
-            outstandingOrders.Apply(new OrderSubmitted { OrderId = "5" });
+            outstandingOrders.Apply(new OrderSubmitted_V2 { OrderId = "5" });
             outstandingOrders.Apply(new OrderCanceled { OrderId = "5" });
 
             // When
@@ -195,7 +195,7 @@ namespace TestProject1
             var ordersPersUser = new OrderPerUser();
             ordersPersUser.Apply(new ItemAddedToOrder {Name = "Item1", Price = 12.34M});
             ordersPersUser.Apply(new ItemAddedToOrder {Name = "Item2", Price = 34.56M});
-            ordersPersUser.Apply(new OrderSubmitted {Date = new DateTime(2010, 10, 10)});
+            ordersPersUser.Apply(new OrderSubmitted_V2 { Date = new DateTime(2010, 10, 10)});
 
             // Then
             Assert.AreEqual(46.90M, ordersPersUser.TotalPrice);

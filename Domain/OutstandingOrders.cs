@@ -24,7 +24,7 @@ namespace Domain
             }
         }
 
-        public void Apply(OrderSubmitted orderSubmitted)
+        public void Apply(OrderSubmitted_V2 orderSubmitted)
         {
             var order = _orders[orderSubmitted.OrderId];
             _orders[orderSubmitted.OrderId] = (order.Items, OrderStatus.Submitted);
