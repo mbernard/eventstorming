@@ -43,7 +43,7 @@ namespace Domain
             this.TotalPrice = this.Items.Sum(x => x.Price);
         }
         
-        public string OrderId { get; set; }
+        public void Apply(OrderSubmitted_V2 orderSubmitted)
         {
             this.OrderDate = orderSubmitted.Date;
         }
