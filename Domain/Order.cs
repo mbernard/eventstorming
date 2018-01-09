@@ -17,8 +17,16 @@ namespace Domain
             {
                 //return FinishOrder((FinishOrder) order);
             }
-
+            if (order is StartFoodPreparation)
+            {
+                return StartFoodPreparation((StartFoodPreparation) order);
+            }
             throw new InvalidOperationException("Unknown command.");
+        }
+
+        private IEnumerable<object> StartFoodPreparation(StartFoodPreparation order)
+        {
+            return new[] {new OrderStarted()};
         }
 
         private IEnumerable<object> CancelOrder(CancelOrder cancelOrder)
@@ -68,6 +76,7 @@ namespace Domain
 
     public class GetOrderStatus
     {
+
         public OrderStatus Status { get; set; }
 
         public void Apply(OrderSubmitted orderSubmitted)
@@ -98,6 +107,7 @@ namespace Domain
 
     public class FoodDelivered
     {
+        
     }
 
     public class OrderPrepared
@@ -140,8 +150,7 @@ namespace Domain
     public class OrderNotSubmittedException : Exception
     {
         public OrderNotSubmittedException(string message) : base(message)
-        {
-        }
+        { }
     }
 
     public class CancelOrder
@@ -166,6 +175,14 @@ namespace Domain
     }
 
     public class OrderPickedUp
+    {
+    }
+
+    public class OrderStarted
+    {
+    }
+
+    public class StartFoodPreparation
     {
     }
 }

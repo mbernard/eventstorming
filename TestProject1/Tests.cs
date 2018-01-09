@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+
 using Domain;
+
 using NUnit.Framework;
 
 namespace TestProject1
@@ -76,8 +78,8 @@ namespace TestProject1
             Assert.True(caught != null);
             Assert.True(caught is OrderNotSubmittedException);
         }
-
-        [Test]
+		
+		[Test]
         public void TotalPriceIsCorrect()
         {
             // Given
@@ -117,6 +119,11 @@ namespace TestProject1
         {
             var order = new Order();
             order.Hydrate(new OrderSubmitted());
+
+            var events = order.Execute(new StartFoodPreparation());
+
+            Assert.True(events.Count() == 1);
+            Assert.True(events.First() is OrderStarted);
         }
 
         [Test]
