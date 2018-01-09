@@ -103,11 +103,15 @@ namespace Domain
 
         private IEnumerable<object> SubmitOrder(SubmitOrder submitOrder)
         {
+            this.IsPaid = submitOrder.IsPaid;
+
             return new[]
             {
                 new OrderSubmitted()
             };
         }
+
+        public bool IsPaid { get; set; }
 
         private IEnumerable<object> ConfirmDelivery(ConfirmDelivery confirmDelivery)
         {
@@ -154,6 +158,7 @@ namespace Domain
 
     public class SubmitOrder
     {
+        public bool IsPaid { get; set; }
     }
 
     public enum OrderStatus
