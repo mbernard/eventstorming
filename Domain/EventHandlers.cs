@@ -31,7 +31,7 @@ namespace Domain
                 if (@event is  ItemRemovedFromOrder)
                 {
                     var itemRemoved = (ItemRemovedFromOrder) @event;
-                    var orderPerUser = orderPerUserRepository.GetForOrder(itemAdded.OrderId);
+                    var orderPerUser = orderPerUserRepository.GetForOrder(itemRemoved.OrderId);
                     orderPerUser.Apply(itemRemoved);
                 }
             };

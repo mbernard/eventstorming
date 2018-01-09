@@ -201,7 +201,7 @@ namespace TestProject1
         }
 
         [Test]
-        public void RemoveItem()
+        public void RemoveItem2()
         {
             // Given
             var ordersPersUser = new OrderPerUser();
@@ -214,7 +214,7 @@ namespace TestProject1
         }
         
         [Test]
-        public void RemoveItem2()
+        public void RemoveItem3()
         {
             // Given
             var ordersPersUser = new OrderPerUser();
@@ -224,7 +224,7 @@ namespace TestProject1
 
             // Then
             Assert.IsTrue(ordersPersUser.Items.Count == 1);
-            Assert.AreEqual(46.90M, ordersPersUser.TotalPrice);
+            Assert.AreEqual(12.34M, ordersPersUser.TotalPrice);
         }
         
         [Test]
@@ -289,7 +289,7 @@ namespace TestProject1
             order.Hydrate(new OrderCreated("3"));
             order.Hydrate(new ItemAddedToOrder {OrderId = "3", Name = "Un Item"});
 
-            var events = order.Execute(new RemoveItemFromOrder {OrderId = "3", Name = "Un Item"});
+            var events = order.Execute(new RemoveItemFromOrder {Name = "Un Item"});
             
             Assert.True(events.Count() == 1);
             Assert.True(events.First() is ItemRemovedFromOrder);

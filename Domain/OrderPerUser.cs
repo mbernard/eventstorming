@@ -40,7 +40,7 @@ namespace Domain
             }
 
             Items = newList;
-            this.TotalPrice += itemAddedToOrder.Price;
+            this.TotalPrice = this.Items.Sum(x => x.Price);
         }
         
         public void Apply(OrderSubmitted orderSubmitted)
