@@ -272,7 +272,6 @@ namespace Domain
 
     public class AddItemToOrder
     {
-        public string Id { get; }
         public string Name { get; }
         public decimal Price { get; }
 
