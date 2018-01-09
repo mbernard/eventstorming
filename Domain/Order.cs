@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-
+using System.Linq;
 using Infra;
 
 namespace Domain
@@ -11,12 +11,11 @@ namespace Domain
         {
         }
 
-        private bool received;
-        private bool pickedUp;
         private OrderStatus Status;
         private string OrderId;
         private bool isPaid;
-
+        private List<string> items = new List<string>();
+        
         public IEnumerable<object> Execute(object order)
         {
             if (order is CreateOrder)
@@ -46,6 +45,9 @@ namespace Domain
                 return PayOrder((PayOrder) order);
             }
 
+            if (order is RemoveItemFromOrder)
+                return RemoveItemFromOrder((RemoveItemFromOrder) order);
+
             throw new InvalidOperationException("Unknown command.");
         }
 
@@ -62,12 +64,23 @@ namespace Domain
             };
         }
 
+        private IEnumerable<object> RemoveItemFromOrder(RemoveItemFromOrder removeItemFromOrder)
+        {
+            if (!items.Contains(removeItemFromOrder.Name))
+                throw new Exception("Item doesn't exists in this order.");
+            
+            return new[]
+            {
+                new ItemRemovedFromOrder {OrderId = this.OrderId, Name = removeItemFromOrder.Name}
+            };
+        }
+
         private IEnumerable<object> PayOrder(PayOrder payOrder)
         {
             return new object[]
             {
                 new OrderPaid(payOrder.OrderId, payOrder.Amount),
-                new OrderSubmitted { OrderId = payOrder.OrderId, Date = DateTime.Now},
+                new OrderSubmitted_V2 { OrderId = payOrder.OrderId, Date = DateTime.Now},
             };
         }
 
@@ -114,6 +127,8 @@ namespace Domain
             }
         }
 
+        public bool IsPaid { get; set; }
+
         private IEnumerable<object> ConfirmDelivery(ConfirmDelivery confirmDelivery)
         {
             return new[]
@@ -128,14 +143,26 @@ namespace Domain
         {
             if (@event is OrderCreated)
                 this.OnOrderCreated((OrderCreated) @event);
-            if (@event is OrderSubmitted)
-                OnOrderSubmitted((OrderSubmitted) @event);
-            if (@event is OrderStarted)
+            if(@event is OrderSubmitted_V2)
+                OnOrderSubmitted_V2((OrderSubmitted_V2) @event);
+         if (@event is OrderStarted)
                 OnOrderStarted((OrderStarted) @event);
             if (@event is OrderPickedUp)
                 OnOrderPickedUp((OrderPickedUp) @event);
             if (@event is OrderPaid)
                 OnOrderPaid((OrderPaid) @event);
+            if (@event is ItemAddedToOrder)
+                OnItemAddedToOrder((ItemAddedToOrder)@event);
+        }
+
+        private void OnItemAddedToOrder(ItemAddedToOrder @event)
+        {
+            this.items.Add(@event.Name);
+        }
+
+        private void OnOrderSubmitted_V2(OrderSubmitted_V2 @event)
+        {
+            Status = OrderStatus.Submitted;
         }
 
         private void OnOrderPaid(OrderPaid @event)
@@ -157,15 +184,11 @@ namespace Domain
         {
             Status = OrderStatus.PickedUp;
         }
-
-        private void OnOrderSubmitted(OrderSubmitted @event)
-        {
-            Status = OrderStatus.Submitted;
-        }
     }
 
     public class SubmitOrder
     {
+        public bool IsPaid { get; set; }
     }
 
     public enum OrderStatus
@@ -189,6 +212,12 @@ namespace Domain
         {
             Status = OrderStatus.Submitted;
         }
+
+        public void Apply(OrderSubmitted_V2 orderSubmitted)
+        {
+            Status = OrderStatus.Submitted;
+        }
+
 
         public void Apply(OrderStarted orderStarted)
         {
@@ -272,7 +301,16 @@ namespace Domain
         public string OrderId { get; }
     }
 
+
+
     public class OrderSubmitted
+    {
+        public string OrderId { get; set; }
+        public DateTime Date { get; set; }
+        public string Address { get; set; }
+    }
+
+    public class OrderSubmitted_V2
     {
         public string OrderId { get; set; }
         public DateTime Date { get; set; }
@@ -338,5 +376,21 @@ namespace Domain
             Name = name;
             Price = price;
         }
+    }
+
+    public class RemoveItemFromOrder
+    {
+        public string Name { get; set; }
+    }
+
+    public class ItemRemovedFromOrder
+    {
+        public string OrderId { get; set; }
+        public string Name { get; set; }
+    }
+
+    public class OrderPaidOnDelivery
+    {
+        public string OrderId { get; set; }
     }
 }

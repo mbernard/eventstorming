@@ -1,26 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
-
 using Domain;
-
 using Infra;
 
 namespace Web
 {
-    public class MvcApplication : System.Web.HttpApplication
+    public class MvcApplication : HttpApplication
     {
         public static readonly OrderPerUserRepository OrderPerUserRepository = new OrderPerUserRepository();
         public static readonly OutstandingOrders OutstandinOrders = new OutstandingOrders();
         public static readonly CommandExecutor CommandExecutor = new CommandExecutor(new[]
-        {
-            EventHandlers.OnOrderCreatedEventHandler(OrderPerUserRepository),
-            EventHandlers.OutstandingOrdersEventHandlers(OutstandinOrders)
-        });
+            {
+                EventHandlers.OnOrderCreatedEventHandler(OrderPerUserRepository),
+                EventHandlers.OutstandingOrdersEventHandlers(OutstandinOrders)
+            },
+            new List<Func<object, object>> {OrderSubmittedMapper});
 
         static MvcApplication()
         {
@@ -31,6 +29,20 @@ namespace Web
 //            var createOrder3 = new CreateOrder("3");
 //            CommandExecutor.Execute<Order>(createOrder3.OrderId, createOrder3);
 //        }
+        }
+
+        private static object OrderSubmittedMapper(object @event)
+        {
+            var orderSubmitted = @event as OrderSubmitted;
+            if (orderSubmitted != null)
+                return new OrderSubmitted_V2
+                {
+                    Address = orderSubmitted.Address,
+                    Date = orderSubmitted.Date,
+                    OrderId = orderSubmitted.OrderId
+                };
+
+            return @event;
         }
 
         protected void Application_Start()

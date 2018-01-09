@@ -74,6 +74,15 @@ namespace Web.Controllers
 
         }
         
+        [HttpPost]
+        public ActionResult RemoveItemFromOrder(string orderId, string name)
+        {
+            MvcApplication.CommandExecutor.Execute<Order>(orderId, new RemoveItemFromOrder{Name = name});
+
+            return RedirectToAction("Index", "Order", new {id = orderId});
+
+        }
+        
 
         [HttpPost]
         public ActionResult SubmitOrder(string orderId)

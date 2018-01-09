@@ -7,11 +7,18 @@ namespace Infra
     public class InMemoryEventStore
     {
         private IDictionary<string, List<object>> streams = new Dictionary<string, List<object>>();
+        private IEnumerable<Func<object, object>> eventMappers;
 
+        public InMemoryEventStore(IEnumerable<Func<object, object>> eventMappers)
+        {
+            this.eventMappers = eventMappers;
+        }
 
         public IEnumerable<object> ReadEvents(string id)
         {
-            return streams.TryGetValue(id, out var stream) ? stream : Enumerable.Empty<object>();
+            var s =  streams.TryGetValue(id, out var stream) ? stream : Enumerable.Empty<object>();
+
+            return s.Select(x =>eventMappers.Aggregate(x, (e, f) => f(e)));
         }
 
         public void SaveEvents(string id, IEnumerable<object> newEvents)
@@ -27,12 +34,13 @@ namespace Infra
 
     public class CommandExecutor
     {
-        private readonly InMemoryEventStore eventStore = new InMemoryEventStore();
+        private readonly InMemoryEventStore eventStore;
         private readonly IEnumerable<Action<object>> handlers;
 
-        public CommandExecutor(IEnumerable<Action<object>> handlers)
+        public CommandExecutor(IEnumerable<Action<object>> handlers, IEnumerable<Func<object, object>> eventMappers)
         {
             this.handlers = handlers;
+            this.eventStore =  new InMemoryEventStore(eventMappers);
         }
 
         public void Execute<TAggregate>(string aggregateId, object command) where TAggregate : IAggregate, new()

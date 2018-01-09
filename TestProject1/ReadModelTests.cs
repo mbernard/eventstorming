@@ -16,10 +16,10 @@ namespace TestProject1
             
             outstandingOrders.Apply(new ItemAddedToOrder {OrderId = "3", Name = "Pizza", Price = 2});
             outstandingOrders.Apply(new ItemAddedToOrder {OrderId = "3", Name = "Burger", Price = 1});
-            outstandingOrders.Apply(new OrderSubmitted {OrderId = "3", Date = DateTime.Now});
+            outstandingOrders.Apply(new OrderSubmitted_V2 { OrderId = "3", Date = DateTime.Now});
             outstandingOrders.Apply(new ItemAddedToOrder {OrderId = "5", Name = "Chicken Wings", Price = 1});
             outstandingOrders.Apply(new ItemAddedToOrder {OrderId = "5", Name = "Poutine", Price = 2});
-            outstandingOrders.Apply(new OrderSubmitted {OrderId = "5", Date = DateTime.Now});
+            outstandingOrders.Apply(new OrderSubmitted_V2 { OrderId = "5", Date = DateTime.Now});
             
             //When
             outstandingOrders.Apply(new OrderCanceled {OrderId = "3"});
@@ -41,9 +41,9 @@ namespace TestProject1
             var outstandingOrders = new OutstandingOrders();
             outstandingOrders.Apply(new ItemAddedToOrder { OrderId = "3", Name = "Hamburger", Price = 5 });
             outstandingOrders.Apply(new ItemAddedToOrder { OrderId = "3", Name = "Pizza", Price = 5 });
-            outstandingOrders.Apply(new OrderSubmitted { OrderId = "3" });
+            outstandingOrders.Apply(new OrderSubmitted_V2 { OrderId = "3" });
             outstandingOrders.Apply(new ItemAddedToOrder { OrderId = "5", Name = "Chicken Wings", Price = 10 });
-            outstandingOrders.Apply(new OrderSubmitted { OrderId = "5" });
+            outstandingOrders.Apply(new OrderSubmitted_V2 { OrderId = "5" });
             outstandingOrders.Apply(new OrderStarted() { OrderId = "5" });
 
             // When
@@ -56,9 +56,9 @@ namespace TestProject1
         {
             //Given
             var deliveryList = new DeliveryList();
-            deliveryList.Apply(new OrderSubmitted {OrderId = "3", Date = DateTime.Now, Address = "1234 rue Louis, Mtl"});
+            deliveryList.Apply(new OrderSubmitted_V2 { OrderId = "3", Date = DateTime.Now, Address = "1234 rue Louis, Mtl"});
             deliveryList.Apply(new OrderPrepared {OrderId = "3"});
-            deliveryList.Apply(new OrderSubmitted {OrderId = "5", Date = DateTime.Now, Address = "5678 rue Justin, Mtl"});
+            deliveryList.Apply(new OrderSubmitted_V2 { OrderId = "5", Date = DateTime.Now, Address = "5678 rue Justin, Mtl"});
             
             //When
             deliveryList.Apply(new OrderPrepared {OrderId = "5"});
@@ -78,9 +78,9 @@ namespace TestProject1
         {
             //Given
             var deliveryList = new DeliveryList();
-            deliveryList.Apply(new OrderSubmitted {OrderId = "3", Date = DateTime.Now, Address = "1234 rue Louis, Mtl"});
+            deliveryList.Apply(new OrderSubmitted_V2 { OrderId = "3", Date = DateTime.Now, Address = "1234 rue Louis, Mtl"});
             deliveryList.Apply(new OrderPrepared {OrderId = "3"});
-            deliveryList.Apply(new OrderSubmitted {OrderId = "5", Date = DateTime.Now, Address = "5678 rue Justin, Mtl"});
+            deliveryList.Apply(new OrderSubmitted_V2 { OrderId = "5", Date = DateTime.Now, Address = "5678 rue Justin, Mtl"});
             deliveryList.Apply(new OrderPrepared {OrderId = "5"});
             deliveryList.Apply(new OrderCanceled {OrderId = "3"});
             deliveryList.Apply(new OrderPickedUp {OrderId = "5"});
@@ -98,9 +98,9 @@ namespace TestProject1
         {
             //Given
             var deliveryList = new DeliveryList();
-            deliveryList.Apply(new OrderSubmitted {OrderId = "3", Date = DateTime.Now, Address = "1234 rue Louis, Mtl"});
+            deliveryList.Apply(new OrderSubmitted_V2 { OrderId = "3", Date = DateTime.Now, Address = "1234 rue Louis, Mtl"});
             deliveryList.Apply(new OrderPrepared {OrderId = "3"});
-            deliveryList.Apply(new OrderSubmitted {OrderId = "5", Date = DateTime.Now, Address = "5678 rue Justin, Mtl"});
+            deliveryList.Apply(new OrderSubmitted_V2 { OrderId = "5", Date = DateTime.Now, Address = "5678 rue Justin, Mtl"});
             deliveryList.Apply(new OrderPrepared {OrderId = "5"});
             deliveryList.Apply(new OrderPickedUp {OrderId = "3"});
             deliveryList.Apply(new OrderPickedUp {OrderId = "5"});
@@ -119,9 +119,9 @@ namespace TestProject1
         {
             //Given
             var deliveryList = new DeliveryList();
-            deliveryList.Apply(new OrderSubmitted {OrderId = "3", Date = DateTime.Now, Address = "1234 rue Louis, Mtl"});
+            deliveryList.Apply(new OrderSubmitted_V2 { OrderId = "3", Date = DateTime.Now, Address = "1234 rue Louis, Mtl"});
             deliveryList.Apply(new OrderPrepared {OrderId = "3"});
-            deliveryList.Apply(new OrderSubmitted {OrderId = "5", Date = DateTime.Now, Address = "5678 rue Justin, Mtl"});
+            deliveryList.Apply(new OrderSubmitted_V2 { OrderId = "5", Date = DateTime.Now, Address = "5678 rue Justin, Mtl"});
             deliveryList.Apply(new OrderPrepared {OrderId = "5"});
             deliveryList.Apply(new OrderPickedUp {OrderId = "3"});
             
@@ -135,6 +135,27 @@ namespace TestProject1
             Assert.True(deliveryList.Deliveries.ElementAt(1).Value.Address == "5678 rue Justin, Mtl");
             Assert.True(deliveryList.Deliveries.ElementAt(1).Value.Status == OrderStatus.ReadyForPickup);
         
+        }
+
+        [Test]
+        public void Receipt_When_OrderPaidOnDelivery()
+        {
+            //Given
+            var receipt = new Receipt();
+            receipt.Apply(new OrderCreated("5"));
+            receipt.Apply(new ItemAddedToOrder {OrderId = "5", Name = "French Fries", Price = 1});
+            receipt.Apply(new ItemAddedToOrder {OrderId = "5", Name = "Poutine", Price = 2});
+            receipt.Apply(new ItemRemovedFromOrder {OrderId = "5", Name = "French Fries"});
+            receipt.Apply(new OrderPaidOnDelivery {OrderId = "5"});
+
+            //Then
+            Assert.True(receipt.Receipts.Count() == 1);
+            Assert.True(receipt.Receipts.First().Key == "5");
+            Assert.True(receipt.Receipts.First().Value.Status == "Paid");
+            Assert.True(receipt.Receipts.First().Value.Items.Count() == 1);
+            Assert.True(receipt.Receipts.First().Value.Items.First().Name == "Poutine");
+            Assert.True(receipt.Receipts.First().Value.Items.First().Price == 2);
+            Assert.True(receipt.Receipts.First().Value.Price == 2);
         }
         
     }

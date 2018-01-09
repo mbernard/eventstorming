@@ -37,7 +37,7 @@ namespace TestProject1
         {
             //Given
             var order = new Order();
-            order.Hydrate(new OrderSubmitted());
+            order.Hydrate(new OrderSubmitted_V2());
 
             //When
             var events = order.Execute(new CancelOrder("1"));
@@ -146,9 +146,9 @@ namespace TestProject1
             var outstandingOrders = new OutstandingOrders();
             outstandingOrders.Apply(new ItemAddedToOrder { OrderId = "3", Name = "Hamburger", Price = 5 });
             outstandingOrders.Apply(new ItemAddedToOrder { OrderId = "3", Name = "Pizza", Price = 5 });
-            outstandingOrders.Apply(new OrderSubmitted { OrderId = "3" });
+            outstandingOrders.Apply(new OrderSubmitted_V2 { OrderId = "3" });
             outstandingOrders.Apply(new ItemAddedToOrder { OrderId = "5", Name = "Chicken Wings", Price = 10 });
-            outstandingOrders.Apply(new OrderSubmitted{ OrderId = "5" });
+            outstandingOrders.Apply(new OrderSubmitted_V2 { OrderId = "5" });
             outstandingOrders.Apply(new OrderPrepared{ OrderId = "5" });
 
             // When
@@ -164,9 +164,9 @@ namespace TestProject1
             var outstandingOrders = new OutstandingOrders();
             outstandingOrders.Apply(new ItemAddedToOrder { OrderId = "3", Name = "Hamburger", Price = 5 });
             outstandingOrders.Apply(new ItemAddedToOrder { OrderId = "3", Name = "Pizza", Price = 5 });
-            outstandingOrders.Apply(new OrderSubmitted { OrderId = "3" });
+            outstandingOrders.Apply(new OrderSubmitted_V2 { OrderId = "3" });
             outstandingOrders.Apply(new ItemAddedToOrder { OrderId = "5", Name = "Chicken Wings", Price = 10 });
-            outstandingOrders.Apply(new OrderSubmitted { OrderId = "5" });
+            outstandingOrders.Apply(new OrderSubmitted_V2 { OrderId = "5" });
             outstandingOrders.Apply(new OrderCanceled { OrderId = "5" });
 
             // When
@@ -191,16 +191,42 @@ namespace TestProject1
         public void TotalPriceIsCorrect()
         {
             // Given
-            // When
             var ordersPersUser = new OrderPerUser();
             ordersPersUser.Apply(new ItemAddedToOrder {Name = "Item1", Price = 12.34M});
             ordersPersUser.Apply(new ItemAddedToOrder {Name = "Item2", Price = 34.56M});
-            ordersPersUser.Apply(new OrderSubmitted {Date = new DateTime(2010, 10, 10)});
+            ordersPersUser.Apply(new OrderSubmitted_V2 { Date = new DateTime(2010, 10, 10)});
 
             // Then
             Assert.AreEqual(46.90M, ordersPersUser.TotalPrice);
         }
 
+        [Test]
+        public void RemoveItem2()
+        {
+            // Given
+            var ordersPersUser = new OrderPerUser();
+            ordersPersUser.Apply(new ItemAddedToOrder {Name = "Item1", Price = 12.34M});
+            ordersPersUser.Apply(new ItemRemovedFromOrder {Name = "Item1"});
+
+            // Then
+            Assert.IsTrue(ordersPersUser.Items.Count == 0);
+            Assert.AreEqual(0M, ordersPersUser.TotalPrice);
+        }
+        
+        [Test]
+        public void RemoveItem3()
+        {
+            // Given
+            var ordersPersUser = new OrderPerUser();
+            ordersPersUser.Apply(new ItemAddedToOrder {Name = "Item1", Price = 12.34M});
+            ordersPersUser.Apply(new ItemAddedToOrder {Name = "Item1", Price = 12.34M});
+            ordersPersUser.Apply(new ItemRemovedFromOrder {Name = "Item1"});
+
+            // Then
+            Assert.IsTrue(ordersPersUser.Items.Count == 1);
+            Assert.AreEqual(12.34M, ordersPersUser.TotalPrice);
+        }
+        
         [Test]
         public void OrderPickedUp()
         {
@@ -254,6 +280,26 @@ namespace TestProject1
             Assert.True(events.First() is ItemAddedToOrder);
             Assert.True(((ItemAddedToOrder)events.First()).Name == "Potato");
             Assert.True(((ItemAddedToOrder)events.First()).Price == 15.00M);
+        }
+
+        [Test]
+        public void RemoveItem()
+        {
+            var order = new Order();
+            order.Hydrate(new OrderCreated("3"));
+            order.Hydrate(new ItemAddedToOrder {OrderId = "3", Name = "Un Item"});
+
+            var events = order.Execute(new RemoveItemFromOrder {Name = "Un Item"});
+            
+            Assert.True(events.Count() == 1);
+            Assert.True(events.First() is ItemRemovedFromOrder);
+        }
+
+        [Test]
+        public void MappingSubmitOrderFromV1ToV2()
+        {
+            var order = new Order();
+            order.Hydrate(new OrderSubmitted());
         }
     }
 }

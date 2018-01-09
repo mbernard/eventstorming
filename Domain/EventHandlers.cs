@@ -27,6 +27,13 @@ namespace Domain
                     var orderPerUser = orderPerUserRepository.GetForOrder(itemAdded.OrderId);
                     orderPerUser.Apply(itemAdded);
                 }
+                
+                if (@event is  ItemRemovedFromOrder)
+                {
+                    var itemRemoved = (ItemRemovedFromOrder) @event;
+                    var orderPerUser = orderPerUserRepository.GetForOrder(itemRemoved.OrderId);
+                    orderPerUser.Apply(itemRemoved);
+                }
             };
         };
 
@@ -39,9 +46,9 @@ namespace Domain
                     outstandingOrders.Apply((ItemAddedToOrder)@event);
                 }
 
-                if (@event is OrderSubmitted)
+                if (@event is OrderSubmitted_V2)
                 {
-                    outstandingOrders.Apply((OrderSubmitted)@event);
+                    outstandingOrders.Apply((OrderSubmitted_V2)@event);
                 }
 
                 if (@event is OrderCanceled)

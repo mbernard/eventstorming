@@ -18,7 +18,14 @@
     <ul>
         @foreach (var item in Model.Items)
         {
-            <li>@item.Name - @item.Price</li>
+            <li>@item.Name - @item.Price
+                @using (Html.BeginForm("RemoveItemFromOrder", "Order", FormMethod.Post))
+                {
+                    @Html.Hidden("OrderId", @Model.OrderId)
+                    @Html.Hidden("Name", @item.Name)
+                    <input type="submit" value="Remove"/>
+                }       
+                </li>
         }
     </ul>
     <p>Total Price: @Model.TotalPrice</p>
