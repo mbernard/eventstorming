@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-
 using Domain;
-
 using NUnit.Framework;
 
 namespace TestProject1
@@ -27,11 +25,40 @@ namespace TestProject1
         }
 
         [Test]
+        public void FinishAnOrder()
+        {
+            // Given
+            var order = new Order();
+            order.Hydrate(new OrderStarted());
+
+            // When
+            var events = order.Execute(new FinishOrder());
+
+            // Then
+            Assert.AreEqual(1, events.Count());
+            Assert.True(events.First() is OrderPrepared);
+        }
+
+        [Test]
+        public void FinishAnOrderException()
+        {
+            // Given
+            var order = new Order();
+            order.Hydrate(new OrderPickedUp());
+
+            // When
+            var events = order.Execute(new FinishOrder());
+
+            // Then
+            Assert.AreEqual(0, events.Count());
+        }
+
+        [Test]
         public void CancelANonReceivedOrder()
         {
             //Given
             var order = new Order();
-            
+
             //When
             IEnumerable<object> events = Enumerable.Empty<object>();
             Exception caught = null;
@@ -47,10 +74,10 @@ namespace TestProject1
             //Then
             Assert.True(!events.Any());
             Assert.True(caught != null);
-            Assert.True(caught is OrderNotReceivedException);
+            Assert.True(caught is OrderNotSubmittedException);
         }
-		
-		[Test]
+
+        [Test]
         public void TotalPriceIsCorrect()
         {
             // Given
@@ -90,7 +117,6 @@ namespace TestProject1
         {
             var order = new Order();
             order.Hydrate(new OrderSubmitted());
-            
         }
 
         [Test]
@@ -109,7 +135,7 @@ namespace TestProject1
         {
             // Given
             var orderStatus = new GetOrderStatus();
-            orderStatus.Apply(new OrederPrepared());
+            orderStatus.Apply(new OrderPrepared());
 
             // Then
             Assert.AreEqual(OrderStatus.Prepared, orderStatus.Status);
@@ -123,7 +149,7 @@ namespace TestProject1
             orderStatus.Apply(new OrderPickedUp());
 
             // Then
-            Assert.AreEqual(OrderStatus.InTransit, orderStatus.Status);
+            Assert.AreEqual(OrderStatus.PickedUp, orderStatus.Status);
         }
 
         [Test]
