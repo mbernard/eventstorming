@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+
+using Domain;
+
 using NUnit.Framework;
 
 namespace TestProject1
@@ -61,88 +64,5 @@ namespace TestProject1
             Assert.AreEqual(46.90M, ordersPersUser.TotalPrice);
         }
         
-    }
-
-    public class OrdersPerUser
-    {
-        public DateTime OrderDate { get; set; }
-
-        public decimal TotalPrice { get; set; }
-
-        public IList<(string Name, decimal Price)> Items { get; set; } = new List<(string, decimal)>();
-
-
-        public void Apply(ItemAddedToOrder itemAddedToOrder)
-        {
-            Items.Add((itemAddedToOrder.Name, itemAddedToOrder.Price));
-            TotalPrice += itemAddedToOrder.Price;
-        }
-
-        public void Apply(OrderSubmitted orderSubmitted)
-        {
-            OrderDate = orderSubmitted.Date;
-        }
-    }
-
-    public class OrderCanceled
-    {
-    }
-
-    public class OrderReceived
-    {
-    }
-
-    public class Order
-    {
-        private bool received;
-
-        public IEnumerable<object> Execute(object order)
-        {
-            if (order is CancelOrder)
-                return CancelOrder((CancelOrder) order);
-            throw new InvalidOperationException("Unknown command.");
-        }
-
-        private IEnumerable<object> CancelOrder(CancelOrder cancelOrder)
-        {
-            if (!received)
-            {
-                throw new OrderNotReceivedException("Order not received.");
-            }
-
-            return new[] {new OrderCanceled()};
-        }
-
-        public void Hydrate(object @event)
-        {
-            if (@event is OrderReceived)
-                OnOrderReceived((OrderReceived) @event);
-        }
-
-        private void OnOrderReceived(OrderReceived @event)
-        {
-            received = true;
-        }
-    }
-
-    public class OrderNotReceivedException : Exception
-    {
-        public OrderNotReceivedException(string message) : base(message)
-        {}
-    }
-
-    public class CancelOrder
-    {
-    }
-
-    public class OrderSubmitted
-    {
-        public DateTime Date { get; set; }
-    }
-
-    public class ItemAddedToOrder
-    {
-        public string Name { get; set; }
-        public decimal Price { get; set; }
     }
 }

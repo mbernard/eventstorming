@@ -182,7 +182,7 @@
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
-    <Content Include="Views\Order\CancelOrder.cshtml" />
+    <Content Include="Views\Order\Index.cshtml" />
     <Content Include="Views\Order\OrderCancellationConfirmation.cshtml" />
   </ItemGroup>
   <ItemGroup>
@@ -201,6 +201,12 @@
   <ItemGroup>
     <None Include="packages.config" />
     <Content Include="Scripts\jquery-1.10.2.min.map" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Domain\Domain.csproj">
+      <Project>{7b33f3ca-eb52-4530-9fbf-6002b52c5041}</Project>
+      <Name>Domain</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

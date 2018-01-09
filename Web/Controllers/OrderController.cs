@@ -9,9 +9,9 @@ namespace Web.Controllers
     public class OrderController : Controller
     {
         [HttpGet]
-        public ActionResult CancelOrder()
+        public ActionResult Index()
         {
-            return this.View("CancelOrder");
+            return this.View("Index");
         }
 
         [HttpPost]
@@ -24,20 +24,6 @@ namespace Web.Controllers
         public ActionResult OrderCancellationConfirmation()
         {
             return this.View("OrderCancellationConfirmation");
-        }
-
-        public ActionResult About()
-        {
-            ViewBag.Message = "Your application description page.";
-
-            return View();
-        }
-
-        public ActionResult Contact()
-        {
-            ViewBag.Message = "Your contact page.";
-
-            return View();
         }
     }
 }
