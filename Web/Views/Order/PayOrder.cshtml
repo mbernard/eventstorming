@@ -1,0 +1,32 @@
+﻿@model Domain.OrderPerUser
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title></title>
+</head>
+<body>
+
+    
+<div>
+    Total: @(Model.TotalPrice)$
+</div>
+<div>
+    @using (Html.BeginForm("PayOrder", "Order", FormMethod.Post))
+    {
+        @Html.Hidden("OrderId", @Model.OrderId)
+        @Html.Hidden("Amount", @Model.TotalPrice)
+
+        <p> <label>Credit Card #</label> @Html.TextBox("CreditCardNumber")</p>
+        <p><label>Expiration </label> @Html.TextBox("Expiration")</p>
+        <p><label>Name on the card </label> @Html.TextBox("Name")</p>
+        <input type="submit" value="Confirm & Pay" />
+    }
+</div>
+</body>
+</html>

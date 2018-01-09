@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
+using System.Web.UI.WebControls;
 
 namespace Web
 {
@@ -16,7 +17,7 @@ namespace Web
             routes.MapRoute(
                 name: "Default",
                 url: "{controller}/{action}/{id}",
-                defaults: new { controller = "Order", action = "Index", id = "1" }
+                defaults: new { controller = "Order", action = "List", id = UrlParameter.Optional }
             );
         }
     }

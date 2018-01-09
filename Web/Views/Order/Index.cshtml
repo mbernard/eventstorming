@@ -12,6 +12,7 @@
 </head>
 <body>
 <div>
+    <p>Order Id: @Model.OrderId</p>
     <p>Order Date: @Model.OrderDate.ToString("D")</p>
     <p>Items:</p>
     <ul>
@@ -22,11 +23,34 @@
     </ul>
     <p>Total Price: @Model.TotalPrice</p>
 
-    @using (Html.BeginForm("CancelOrder", "Order", FormMethod.Post))
+    
+    @using (Html.BeginForm("AddItemToOrder", "Order", FormMethod.Post))
     {
-        @Html.Hidden("OrderId", "1")
-        <input type="submit" value="Cancel Order"/>
+        @Html.Hidden("OrderId", @Model.OrderId)
+        @Html.Hidden("Name", "Pizza")
+        @Html.Hidden("Price", "10")
+        <input type="submit" value="Add Pizza (10$)"/>
     }
+    
+    @using (Html.BeginForm("AddItemToOrder", "Order", FormMethod.Post))
+    {
+        @Html.Hidden("OrderId", @Model.OrderId)
+        @Html.Hidden("Name", "French Fried")
+        @Html.Hidden("Price", "2")
+        <input type="submit" value="Add French Fries (2$)"/>
+    }
+    
+    @using (Html.BeginForm("AddItemToOrder", "Order", FormMethod.Post))
+     {
+         @Html.Hidden("OrderId", @Model.OrderId)
+         @Html.Hidden("Name", "Soda Pop")
+         @Html.Hidden("Price", "1")
+         <input type="submit" value="Add Soda Pop (1$)"/>
+     }
+    
+    
+    @Html.ActionLink("Pay...", "PayOrder", new { id = @Model.OrderId })
+    
 </div>
 </body>
 </html>

@@ -89,7 +89,7 @@ namespace TestProject1
         {
             // Given
             var orderStatus = new GetOrderStatus();
-            orderStatus.Apply(new FoodDelivered());
+            orderStatus.Apply(new OrderDelivered());
 
             // Then
             Assert.AreEqual(OrderStatus.Delivered, orderStatus.Status);
@@ -228,7 +228,7 @@ namespace TestProject1
 
             // Then
             Assert.True(events.Count() == 1);
-            Assert.True(events.First() is FoodDelivered);
+            Assert.True(events.First() is OrderDelivered);
         }
 
         [Test]

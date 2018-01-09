@@ -9,22 +9,17 @@ using Domain;
 namespace Web.Controllers
 {
     public class OrderController : Controller
+
     {
+        [HttpGet]
+
+        public ActionResult List()
+        {
+            return View();
+        }
         [HttpGet]
         public ActionResult Index(string id)
         {
-            //var orderPerUser = new OrderPerUser
-            //{
-            //    OrderDate = DateTime.Now.AddDays(-3),
-            //    Items = new List<(string Name, decimal Price)>
-            //    {
-            //        ("Pizza", 10.00m),
-            //        ("Fries", 2.00m),
-            //        ("Coke", 1.00m)
-            //    },
-            //    TotalPrice = 13.00m
-            //};
-
             var orderPerUser = MvcApplication.OrderPerUserRepository.GetForOrder(id);
 
             return this.View("Index", orderPerUser);
@@ -39,6 +34,22 @@ namespace Web.Controllers
             return this.RedirectToAction("OrderCancellationConfirmation");
         }
 
+        [HttpPost]
+        public ActionResult PayOrder(string orderId, decimal amount)
+        {
+            MvcApplication.CommandExecutor.Execute<Order>(orderId, new PayOrder(orderId, amount));
+
+            return View("OrderPaid");
+        }
+
+        [HttpGet]
+        public ActionResult PayOrder(string id)
+        {
+            var orderPerUser = MvcApplication.OrderPerUserRepository.GetForOrder(id);
+
+            return this.View("PayOrder", orderPerUser);
+        }
+
         [HttpGet]
         public ActionResult OrderCancellationConfirmation()
         {
@@ -51,17 +62,26 @@ namespace Web.Controllers
             var orderId = $"order-{Guid.NewGuid()}";
             MvcApplication.CommandExecutor.Execute<Order>(orderId, new CreateOrder(orderId));
 
-            return RedirectToAction("Index", orderId);
+            return RedirectToAction("Index", "Order", new {id = orderId});
         }
         
         [HttpPost]
-        public ActionResult AddItsmteToOrder(string orderId, string name, decimal price)
+        public ActionResult AddItemToOrder(string orderId, string name, decimal price)
         {
             MvcApplication.CommandExecutor.Execute<Order>(orderId, new AddItemToOrder(name, price));
 
-            return RedirectToAction("Index", orderId);
+            return RedirectToAction("Index", "Order", new {id = orderId});
+
         }
         
+
+        [HttpPost]
+        public ActionResult SubmitOrder(string orderId)
+        {
+            MvcApplication.CommandExecutor.Execute<Order>(orderId, new SubmitOrder());
+
+            return RedirectToAction("Index", "Order", new {id = orderId});
+        }
         
         
     }
