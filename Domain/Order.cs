@@ -34,8 +34,8 @@ namespace Domain
 
         public void Hydrate(object @event)
         {
-            if (@event is OrderReceived)
-                this.OnOrderReceived((OrderReceived) @event);
+            if (@event is OrderSubmitted)
+                this.OnOrderReceived((OrderSubmitted) @event);
             if (@event is OrderPickedUp)
                 this.OnOrderPickedUp((OrderPickedUp)@event);
         }
@@ -45,7 +45,7 @@ namespace Domain
             pickedUp = true;
         }
 
-        private void OnOrderReceived(OrderReceived @event)
+        private void OnOrderReceived(OrderSubmitted @event)
         {
             this.received = true;
         }
@@ -128,10 +128,6 @@ namespace Domain
     }
 
     public class OrderCanceled
-    {
-    }
-
-    public class OrderReceived
     {
     }
 
