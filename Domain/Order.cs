@@ -11,8 +11,6 @@ namespace Domain
         {
         }
 
-        private bool received;
-        private bool pickedUp;
         private OrderStatus Status;
         private string OrderId;
         private bool isPaid;
@@ -129,6 +127,8 @@ namespace Domain
             }
         }
 
+        public bool IsPaid { get; set; }
+
         private IEnumerable<object> ConfirmDelivery(ConfirmDelivery confirmDelivery)
         {
             return new[]
@@ -188,6 +188,7 @@ namespace Domain
 
     public class SubmitOrder
     {
+        public bool IsPaid { get; set; }
     }
 
     public enum OrderStatus
@@ -293,6 +294,8 @@ namespace Domain
 
         public string OrderId { get; }
     }
+
+
 
     public class OrderSubmitted
     {
