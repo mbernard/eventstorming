@@ -49,6 +49,15 @@ namespace Web.Controllers
 
             return this.View("PayOrder", orderPerUser);
         }
+        
+        
+        [HttpGet]
+        public ActionResult OrderSubmitted(string id)
+        {
+            var orderPerUser = MvcApplication.OrderPerUserRepository.GetForOrder(id);
+
+            return this.View("OrderSubmitted", orderPerUser);
+        }
 
         [HttpGet]
         public ActionResult OrderCancellationConfirmation()
@@ -83,15 +92,22 @@ namespace Web.Controllers
 
         }
         
-
+        
+        
         [HttpPost]
         public ActionResult SubmitOrder(string orderId)
         {
             MvcApplication.CommandExecutor.Execute<Order>(orderId, new SubmitOrder());
 
-            return RedirectToAction("Index", "Order", new {id = orderId});
+            return View("OrderSubmitted");
         }
-        
-        
+
+
+        public ActionResult PayOnDeliveryOrder(string orderId)
+        {
+            MvcApplication.CommandExecutor.Execute<Order>(orderId, new SubmitOrder());
+
+            return RedirectToAction("OrderSubmitted", "Order", new {id = orderId});
+        }
     }
 }
