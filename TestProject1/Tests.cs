@@ -191,7 +191,6 @@ namespace TestProject1
         public void TotalPriceIsCorrect()
         {
             // Given
-            // When
             var ordersPersUser = new OrderPerUser();
             ordersPersUser.Apply(new ItemAddedToOrder {Name = "Item1", Price = 12.34M});
             ordersPersUser.Apply(new ItemAddedToOrder {Name = "Item2", Price = 34.56M});
@@ -201,6 +200,33 @@ namespace TestProject1
             Assert.AreEqual(46.90M, ordersPersUser.TotalPrice);
         }
 
+        [Test]
+        public void RemoveItem()
+        {
+            // Given
+            var ordersPersUser = new OrderPerUser();
+            ordersPersUser.Apply(new ItemAddedToOrder {Name = "Item1", Price = 12.34M});
+            ordersPersUser.Apply(new ItemRemovedFromOrder {Name = "Item1"});
+
+            // Then
+            Assert.IsTrue(ordersPersUser.Items.Count == 0);
+            Assert.AreEqual(0M, ordersPersUser.TotalPrice);
+        }
+        
+        [Test]
+        public void RemoveItem2()
+        {
+            // Given
+            var ordersPersUser = new OrderPerUser();
+            ordersPersUser.Apply(new ItemAddedToOrder {Name = "Item1", Price = 12.34M});
+            ordersPersUser.Apply(new ItemAddedToOrder {Name = "Item1", Price = 12.34M});
+            ordersPersUser.Apply(new ItemRemovedFromOrder {Name = "Item1"});
+
+            // Then
+            Assert.IsTrue(ordersPersUser.Items.Count == 1);
+            Assert.AreEqual(46.90M, ordersPersUser.TotalPrice);
+        }
+        
         [Test]
         public void OrderPickedUp()
         {
