@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-
+using System.Linq;
 using Infra;
 
 namespace Domain
@@ -14,7 +14,8 @@ namespace Domain
         private OrderStatus Status;
         private string OrderId;
         private bool isPaid;
-
+        private List<string> items = new List<string>();
+        
         public IEnumerable<object> Execute(object order)
         {
             if (order is CreateOrder)
@@ -44,6 +45,9 @@ namespace Domain
                 return PayOrder((PayOrder) order);
             }
 
+            if (order is RemoveItemFromOrder)
+                return RemoveItemFromOrder((RemoveItemFromOrder) order);
+
             throw new InvalidOperationException("Unknown command.");
         }
 
@@ -57,6 +61,17 @@ namespace Domain
                     Name = order.Name,
                     Price = order.Price
                 }
+            };
+        }
+
+        private IEnumerable<object> RemoveItemFromOrder(RemoveItemFromOrder removeItemFromOrder)
+        {
+            if (!items.Contains(removeItemFromOrder.Name))
+                throw new Exception("Item doesn't exists in this order.");
+            
+            return new[]
+            {
+                new ItemRemovedFromOrder {OrderId = removeItemFromOrder.OrderId, Name = removeItemFromOrder.Name}
             };
         }
 
@@ -138,6 +153,13 @@ namespace Domain
                 OnOrderPickedUp((OrderPickedUp) @event);
             if (@event is OrderPaid)
                 OnOrderPaid((OrderPaid) @event);
+            if (@event is ItemAddedToOrder)
+                OnItemAddedToOrder((ItemAddedToOrder)@event);
+        }
+
+        private void OnItemAddedToOrder(ItemAddedToOrder @event)
+        {
+            this.items.Add(@event.Name);
         }
 
         private void OnOrderSubmitted_V2(OrderSubmitted_V2 @event)
@@ -361,5 +383,17 @@ namespace Domain
             Name = name;
             Price = price;
         }
+    }
+
+    public class RemoveItemFromOrder
+    {
+        public string OrderId { get; set; }
+        public string Name { get; set; }
+    }
+
+    public class ItemRemovedFromOrder
+    {
+        public string OrderId { get; set; }
+        public string Name { get; set; }
     }
 }

@@ -255,5 +255,18 @@ namespace TestProject1
             Assert.True(((ItemAddedToOrder)events.First()).Name == "Potato");
             Assert.True(((ItemAddedToOrder)events.First()).Price == 15.00M);
         }
+
+        [Test]
+        public void RemoveItem()
+        {
+            var order = new Order();
+            order.Hydrate(new OrderCreated("3"));
+            order.Hydrate(new ItemAddedToOrder {OrderId = "3", Name = "Un Item"});
+
+            var events = order.Execute(new RemoveItemFromOrder {OrderId = "3", Name = "Un Item"});
+            
+            Assert.True(events.Count() == 1);
+            Assert.True(events.First() is ItemRemovedFromOrder);
+        }
     }
 }
