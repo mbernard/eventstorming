@@ -33,6 +33,27 @@ namespace TestProject1
             Assert.True(firstOrderItems.First() == "Chicken Wings");
             Assert.True(firstOrderItems.ElementAt(1) == "Poutine");
         }
-        
+
+        [Test]
+        public void DeliveryList_When_OrderPrepared()
+        {
+            //Given
+            var deliveryList = new DeliveryList();
+            deliveryList.Apply(new OrderSubmitted {OrderId = "3", Date = DateTime.Now, Address = "1234 rue Louis, Mtl"});
+            deliveryList.Apply(new OrderPrepared {OrderId = "3"});
+            deliveryList.Apply(new OrderSubmitted {OrderId = "5", Date = DateTime.Now, Address = "5678 rue Justin, Mtl"});
+            
+            //When
+            deliveryList.Apply(new OrderPrepared {OrderId = "5"});
+
+            //Then
+            Assert.True(deliveryList.Deliveries.Count() == 2);
+            Assert.True(deliveryList.Deliveries.First().Key == "3");
+            Assert.True(deliveryList.Deliveries.First().Value.Address == "1234 rue Louis, Mtl");
+            Assert.True(deliveryList.Deliveries.First().Value.Status == OrderStatus.ReadyForPickup);
+            Assert.True(deliveryList.Deliveries.ElementAt(1).Key == "5");
+            Assert.True(deliveryList.Deliveries.ElementAt(1).Value.Address == "5678 rue Justin, Mtl");
+            Assert.True(deliveryList.Deliveries.ElementAt(1).Value.Status == OrderStatus.ReadyForPickup);
+        }
     }
 }

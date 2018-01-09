@@ -158,12 +158,13 @@ namespace Domain
 
     public enum OrderStatus
     {
-        None,
-        Submitted,
-        Started,
-        Prepared,
-        PickedUp,
-        Delivered
+        None = 0,
+        Submitted = 1,
+        Started = 2,
+        Prepared = 3,
+        ReadyForPickup = Prepared,
+        PickedUp = 4,
+        Delivered = 5
     }
 
     public class GetOrderStatus
@@ -259,8 +260,8 @@ namespace Domain
     public class OrderSubmitted
     {
         public string OrderId { get; set; }
-
         public DateTime Date { get; set; }
+        public string Address { get; set; }
     }
 
     public class ItemAddedToOrder
