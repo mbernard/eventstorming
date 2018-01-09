@@ -1,26 +1,29 @@
 ﻿using System;
 using System.Collections.Generic;
 
+using Infra;
+
 namespace Domain
 {
-    public class Order
+    public class Order : IAggregate
     {
+        private string orderId;
+        private bool received;
+        private bool pickedUp;
         private OrderStatus Status;
 
         public IEnumerable<object> Execute(object order)
         {
+            if (order is CreateOrder)
+                return this.CreateOrder((CreateOrder)order);
+            if (order is SubmitOrder)
+                return this.SubmitOrder((SubmitOrder)order);
             if (order is CancelOrder)
-            {
                 return CancelOrder((CancelOrder) order);
-            }
             if (order is FinishOrder)
-            {
-                //return FinishOrder((FinishOrder) order);
-            }
+                return FinishOrder((FinishOrder) order);
             if (order is StartFoodPreparation)
-            {
                 return StartFoodPreparation((StartFoodPreparation) order);
-            }
 
             if (order is PickUpOrderForDelivery)
             {
@@ -30,6 +33,11 @@ namespace Domain
             throw new InvalidOperationException("Unknown command.");
         }
 
+        private IEnumerable<object> CreateOrder(CreateOrder createOrder)
+        {
+            return new[] { new OrderCreated(createOrder.OrderId) };
+        }
+        
         private IEnumerable<object> PickUpOrder(PickUpOrderForDelivery order)
         {
             return new[] {new OrderPickedUp()};
@@ -40,14 +48,25 @@ namespace Domain
             return new[] {new OrderStarted()};
         }
 
+        private IEnumerable<object> FinishOrder(FinishOrder finishOrder)
+        {
+            if (Status == OrderStatus.Started)
+                return new[] {new OrderPrepared()};
+
+            throw new InvalidOperationException("Cannot finish an unstarted order");
+        }
+
+
         private IEnumerable<object> CancelOrder(CancelOrder cancelOrder)
         {
             switch (Status)
             {
+                case OrderStatus.None:
+                    throw new OrderNotSubmittedException("Order not submitted.");
                 case OrderStatus.Submitted:
                 case OrderStatus.Started:
                 case OrderStatus.Prepared:
-                    return new[] { new OrderCanceled() };
+                    return new[] {new OrderCanceled()};
                 case OrderStatus.PickedUp:
                     throw new Exception("Cannot cancel pickedup order");
                 case OrderStatus.Delivered:
@@ -57,27 +76,56 @@ namespace Domain
             }
         }
 
+        private IEnumerable<object> SubmitOrder(SubmitOrder submitOrder)
+        {
+            return new[]
+            {
+                new OrderSubmitted()
+            };
+        }
+
+        public string Id { get; set; }
+
         public void Hydrate(object @event)
         {
+            if (@event is OrderCreated)
+                this.OnOrderCreated((OrderCreated)@event);
             if (@event is OrderSubmitted)
                 OnOrderSubmitted((OrderSubmitted) @event);
+            if (@event is OrderStarted)
+                OnOrderStarted((OrderStarted) @event);
             if (@event is OrderPickedUp)
                 OnOrderPickedUp((OrderPickedUp) @event);
         }
 
+        private void OnOrderCreated(OrderCreated @event)
+        {
+            orderId = @event.OrderId;
+        }
+
+        private void OnOrderStarted(OrderStarted @event)
+        {
+            Status = OrderStatus.Started;
+        }
+
         private void OnOrderPickedUp(OrderPickedUp @event)
         {
-            this.Status = OrderStatus.PickedUp;
+            Status = OrderStatus.PickedUp;
         }
 
         private void OnOrderSubmitted(OrderSubmitted @event)
         {
-            this.Status = OrderStatus.Submitted;
+            Status = OrderStatus.Submitted;
         }
+    }
+
+    public class SubmitOrder
+    {
     }
 
     public enum OrderStatus
     {
+        None,
         Submitted,
         Started,
         Prepared,
@@ -113,6 +161,20 @@ namespace Domain
         public void Apply(FoodDelivered foodDelivered)
         {
             Status = OrderStatus.Delivered;
+        }
+    }
+
+    public class OrderStarted
+    {
+    }
+
+    public class OrderCreated
+    {
+        public string OrderId { get; }
+
+        public OrderCreated(string orderId)
+        {
+            this.OrderId = orderId;
         }
     }
 
@@ -160,6 +222,16 @@ namespace Domain
         { }
     }
 
+    public class CreateOrder
+    {
+        public string OrderId { get; }
+
+        public CreateOrder(string orderId)
+        {
+            this.OrderId = orderId;
+        }
+    }
+
     public class CancelOrder
     {
         public CancelOrder(string orderId)
@@ -182,10 +254,6 @@ namespace Domain
     }
 
     public class OrderPickedUp
-    {
-    }
-
-    public class OrderStarted
     {
     }
 

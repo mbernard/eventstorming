@@ -43,5 +43,11 @@
     <Compile Include="Order.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Infra\Infra.csproj">
+      <Project>{014931f1-4f2c-47d1-8f6a-bb84533c7728}</Project>
+      <Name>Infra</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
