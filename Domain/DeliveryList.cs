@@ -27,5 +27,10 @@ namespace Domain
         {
             _deliveries[orderPickedUp.OrderId] = (_deliveries[orderPickedUp.OrderId].Address, OrderStatus.PickedUp);
         }
+
+        public void Apply(OrderDelivered orderDelivered)
+        {
+            _deliveries.Remove(orderDelivered.OrderId);
+        }
     }
 }

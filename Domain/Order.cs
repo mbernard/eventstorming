@@ -113,7 +113,7 @@ namespace Domain
         {
             return new[]
             {
-                new FoodDelivered()
+                new OrderDelivered()
             };
         }
 
@@ -164,6 +164,7 @@ namespace Domain
         Prepared = 3,
         ReadyForPickup = Prepared,
         PickedUp = 4,
+        InTransit = PickedUp,
         Delivered = 5
     }
 
@@ -192,7 +193,7 @@ namespace Domain
             Status = OrderStatus.PickedUp;
         }
 
-        public void Apply(FoodDelivered foodDelivered)
+        public void Apply(OrderDelivered orderDelivered)
         {
             Status = OrderStatus.Delivered;
         }
@@ -213,9 +214,9 @@ namespace Domain
         }
     }
 
-    public class FoodDelivered
+    public class OrderDelivered
     {
-        
+        public string OrderId { get; set; }
     }
 
     public class OrderPrepared
