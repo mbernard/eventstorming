@@ -9,7 +9,7 @@ namespace Domain
             new Dictionary<string, (List<string>, OrderStatus)>();
 
         public IEnumerable<KeyValuePair<string, (List<string> Items, OrderStatus Status)>> Orders =>
-            _orders.Where(x => x.Value.Status == OrderStatus.Submitted);
+            _orders.Where(x => x.Value.Status != OrderStatus.Prepared);
 
         public void Apply(ItemAddedToOrder itemAddedToOrder)
         {
