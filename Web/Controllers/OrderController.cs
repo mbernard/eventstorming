@@ -20,18 +20,6 @@ namespace Web.Controllers
         [HttpGet]
         public ActionResult Index(string id)
         {
-            //var orderPerUser = new OrderPerUser
-            //{
-            //    OrderDate = DateTime.Now.AddDays(-3),
-            //    Items = new List<(string Name, decimal Price)>
-            //    {
-            //        ("Pizza", 10.00m),
-            //        ("Fries", 2.00m),
-            //        ("Coke", 1.00m)
-            //    },
-            //    TotalPrice = 13.00m
-            //};
-
             var orderPerUser = MvcApplication.OrderPerUserRepository.GetForOrder(id);
 
             return this.View("Index", orderPerUser);
@@ -44,6 +32,22 @@ namespace Web.Controllers
             //order.Execute(new CancelOrder(id));
 
             return this.RedirectToAction("OrderCancellationConfirmation");
+        }
+
+        [HttpPost]
+        public ActionResult PayOrder(string orderId, decimal amount)
+        {
+            MvcApplication.CommandExecutor.Execute<Order>(orderId, new PayOrder(orderId, amount));
+
+            return View("OrderPaid");
+        }
+
+        [HttpGet]
+        public ActionResult PayOrder(string id)
+        {
+            var orderPerUser = MvcApplication.OrderPerUserRepository.GetForOrder(id);
+
+            return this.View("PayOrder", orderPerUser);
         }
 
         [HttpGet]

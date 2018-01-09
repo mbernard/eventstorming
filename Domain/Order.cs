@@ -15,13 +15,12 @@ namespace Domain
         private bool pickedUp;
         private OrderStatus Status;
         private string OrderId;
+        private bool isPaid;
 
         public IEnumerable<object> Execute(object order)
         {
             if (order is CreateOrder)
-                return this.CreateOrder((CreateOrder)order);
-            if (order is SubmitOrder)
-                return this.SubmitOrder((SubmitOrder)order);
+                return this.CreateOrder((CreateOrder) order);
             if (order is CancelOrder)
                 return CancelOrder((CancelOrder) order);
             if (order is FinishOrder)
@@ -42,6 +41,11 @@ namespace Domain
                 return AddItem((AddItemToOrder) order);
             }
 
+            if (order is PayOrder)
+            {
+                return PayOrder((PayOrder) order);
+            }
+
             throw new InvalidOperationException("Unknown command.");
         }
 
@@ -58,11 +62,20 @@ namespace Domain
             };
         }
 
+        private IEnumerable<object> PayOrder(PayOrder payOrder)
+        {
+            return new object[]
+            {
+                new OrderPaid(payOrder.OrderId, payOrder.Amount),
+                new OrderSubmitted { OrderId = payOrder.OrderId, Date = DateTime.Now},
+            };
+        }
+
         private IEnumerable<object> CreateOrder(CreateOrder createOrder)
         {
-            return new[] { new OrderCreated(createOrder.OrderId) };
+            return new[] {new OrderCreated(createOrder.OrderId)};
         }
-        
+
         private IEnumerable<object> PickUpOrder(PickUpOrderForDelivery order)
         {
             return new[] {new OrderPickedUp()};
@@ -101,14 +114,6 @@ namespace Domain
             }
         }
 
-        private IEnumerable<object> SubmitOrder(SubmitOrder submitOrder)
-        {
-            return new[]
-            {
-                new OrderSubmitted()
-            };
-        }
-
         private IEnumerable<object> ConfirmDelivery(ConfirmDelivery confirmDelivery)
         {
             return new[]
@@ -122,13 +127,20 @@ namespace Domain
         public void Hydrate(object @event)
         {
             if (@event is OrderCreated)
-                this.OnOrderCreated((OrderCreated)@event);
+                this.OnOrderCreated((OrderCreated) @event);
             if (@event is OrderSubmitted)
                 OnOrderSubmitted((OrderSubmitted) @event);
             if (@event is OrderStarted)
                 OnOrderStarted((OrderStarted) @event);
             if (@event is OrderPickedUp)
                 OnOrderPickedUp((OrderPickedUp) @event);
+            if (@event is OrderPaid)
+                OnOrderPaid((OrderPaid) @event);
+        }
+
+        private void OnOrderPaid(OrderPaid @event)
+        {
+            this.isPaid = true;
         }
 
         private void OnOrderCreated(OrderCreated @event)
@@ -214,7 +226,7 @@ namespace Domain
 
     public class FoodDelivered
     {
-        
+
     }
 
     public class OrderPrepared
@@ -226,7 +238,7 @@ namespace Domain
     {
         public string OrderId { get; set; }
     }
-    
+
     public class FinishOrder
     {
     }
@@ -234,7 +246,8 @@ namespace Domain
     public class OrderNotSubmittedException : Exception
     {
         public OrderNotSubmittedException(string message) : base(message)
-        { }
+        {
+        }
     }
 
     public class CreateOrder
@@ -278,12 +291,38 @@ namespace Domain
     public class StartFoodPreparation
     {
     }
+
     public class PickUpOrderForDelivery
     {
     }
 
+    public class OrderPaid
+    {
+        public OrderPaid(string orderId, decimal amount)
+        {
+            OrderId = orderId;
+            Amount = amount;
+        }
+
+        public string OrderId { get; set; }
+        public decimal Amount { get; set; }
+    }
+
     public class ConfirmDelivery
     {
+    }
+
+    public class PayOrder
+    {
+        public PayOrder(string orderId, decimal amount)
+        {
+            this.OrderId = orderId;
+            this.Amount = amount;
+        }
+
+        public string OrderId { get; }
+
+        public decimal Amount { get; }
     }
 
     public class AddItemToOrder

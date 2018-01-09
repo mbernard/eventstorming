@@ -49,7 +49,7 @@
      }
     
     
-    @Html.ActionLink("Pay...", "PayOrder", "Order")
+    @Html.ActionLink("Pay...", "PayOrder", new { id = @Model.OrderId })
     
 </div>
 </body>
