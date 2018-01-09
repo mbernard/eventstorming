@@ -75,6 +75,12 @@ namespace Domain
 
     public class CancelOrder
     {
+        public CancelOrder(string orderId)
+        {
+            this.OrderId = orderId;
+        }
+
+        public string OrderId { get; }
     }
 
     public class OrderSubmitted

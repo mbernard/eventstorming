@@ -4,6 +4,8 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 
+using Domain;
+
 namespace Web.Controllers
 {
     public class OrderController : Controller
@@ -17,6 +19,9 @@ namespace Web.Controllers
         [HttpPost]
         public ActionResult CancelOrder(string orderId)
         {
+            var order = new Order();
+            order.Execute(new CancelOrder(orderId));
+
             return this.RedirectToAction("OrderCancellationConfirmation");
         }
 

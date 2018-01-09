@@ -19,7 +19,7 @@ namespace TestProject1
             order.Hydrate(new OrderReceived());
 
             //When
-            var events = order.Execute(new CancelOrder());
+            var events = order.Execute(new CancelOrder("1"));
 
             //Then
             Assert.True(events.Count() == 1);
@@ -37,7 +37,7 @@ namespace TestProject1
             Exception caught = null;
             try
             {
-                events = order.Execute(new CancelOrder());
+                events = order.Execute(new CancelOrder("1"));
             }
             catch (Exception e)
             {
