@@ -42,6 +42,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Infra.cs" />
     <Compile Include="Tests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -49,6 +50,10 @@
     <ProjectReference Include="..\Domain\Domain.csproj">
       <Project>{7b33f3ca-eb52-4530-9fbf-6002b52c5041}</Project>
       <Name>Domain</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Infra\Infra.csproj">
+      <Project>{014931F1-4F2C-47D1-8F6A-BB84533C7728}</Project>
+      <Name>Infra</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

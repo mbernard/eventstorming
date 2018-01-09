@@ -25,13 +25,6 @@ namespace Infra
         }
     }
 
-    public interface IAggregate
-    {
-        string Id { get; }
-        void Hydrate(object @event);
-        IEnumerable<object> Execute(object command);
-    }
-
     public class CommandExecutor
     {
         private readonly InMemoryEventStore eventStore = new InMemoryEventStore();
