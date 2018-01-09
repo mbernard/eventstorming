@@ -153,8 +153,8 @@ namespace TestProject1
 
             // When
             // Then
-            Assert.AreEqual(1, outstandingOrders.Orders.Count);
-            Assert.AreEqual("3", outstandingOrders.Orders.First().Key);
+            Assert.AreEqual(1, outstandingOrders._orders.Count);
+            Assert.AreEqual("3", outstandingOrders._orders.First().Key);
         }
 
         [Test]

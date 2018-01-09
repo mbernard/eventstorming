@@ -9,31 +9,38 @@ namespace Domain
 {
     public class OutstandingOrders
     {
-        private readonly IDictionary<string, List<string>> _addedOrders = new Dictionary<string, List<string>>();
-
-        public readonly IDictionary<string, List<string>> Orders = new Dictionary<string, List<string>>();
+        public readonly IDictionary<string, (List<string> Items, OrderStatus Status)> _orders = new Dictionary<string, (List<string>, OrderStatus)>();
 
         public void Apply(ItemAddedToOrder itemAddedToOrder)
         {
-            if (this._addedOrders.ContainsKey(itemAddedToOrder.OrderId))
+            if (this._orders.ContainsKey(itemAddedToOrder.OrderId))
             {
-                this._addedOrders[itemAddedToOrder.OrderId].Add(itemAddedToOrder.Name);
+                var addedOrder = this._orders[itemAddedToOrder.OrderId];
+                addedOrder.Items.Add(itemAddedToOrder.Name);
             }
             else
             {
-                this._addedOrders.Add(itemAddedToOrder.OrderId, new List<string> { itemAddedToOrder.Name });
+                this._orders.Add(itemAddedToOrder.OrderId, (new List<string> { itemAddedToOrder.Name }, OrderStatus.None));
             }
         }
 
+        public IEnumerable<KeyValuePair<string, (List<string> Items, OrderStatus Status)>> Orders =>
+            this._orders.Where(x => x.Value.Status == OrderStatus.Submitted);
+
         public void Apply(OrderSubmitted orderSubmitted)
         {
-            this.Orders.Add(orderSubmitted.OrderId, this._addedOrders[orderSubmitted.OrderId]);
-            this._addedOrders.Remove(orderSubmitted.OrderId);
+            var order = this._orders[orderSubmitted.OrderId];
+            this._orders[orderSubmitted.OrderId] = (order.Items, OrderStatus.Submitted);
         }
 
         public void Apply(OrderPrepared orderPrepared)
         {
-            this.Orders.Remove(orderPrepared.OrderId);
+            this._orders.Remove(orderPrepared.OrderId);
+        }
+
+        public void Apply(OrderCanceled orderCanceled)
+        {
+            this._orders.Remove(orderCanceled.OrderId);
         }
     }
 }

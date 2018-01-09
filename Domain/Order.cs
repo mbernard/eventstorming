@@ -222,6 +222,7 @@ namespace Domain
 
     public class OrderCanceled
     {
+        public string OrderId { get; set; }
     }
     
     public class FinishOrder
@@ -281,6 +282,7 @@ namespace Domain
 
     public class ConfirmDelivery
     {
+    }
 
     public class AddItemToOrder
     {
