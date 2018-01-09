@@ -1,0 +1,18 @@
+﻿@model dynamic
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>title</title>
+</head>
+<body>
+<div>
+      
+    @using (Html.BeginForm("CreateOrder", "Order", FormMethod.Post))
+    {
+        <input type="submit" value="Create Order"/>
+    }
+</div>
+</body>
+</html>

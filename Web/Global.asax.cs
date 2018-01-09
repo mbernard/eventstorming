@@ -22,12 +22,13 @@ namespace Web
 
         static MvcApplication()
         {
-            var createOrder = new CreateOrder("1");
-            CommandExecutor.Execute<Order>(createOrder.OrderId, createOrder);
-            var createOrder2 = new CreateOrder("2");
-            CommandExecutor.Execute<Order>(createOrder2.OrderId, createOrder2);
-            var createOrder3 = new CreateOrder("3");
-            CommandExecutor.Execute<Order>(createOrder3.OrderId, createOrder3);
+//            var createOrder = new CreateOrder("1");
+//            CommandExecutor.Execute<Order>(createOrder.OrderId, createOrder);
+//            var createOrder2 = new CreateOrder("2");
+//            CommandExecutor.Execute<Order>(createOrder2.OrderId, createOrder2);
+//            var createOrder3 = new CreateOrder("3");
+//            CommandExecutor.Execute<Order>(createOrder3.OrderId, createOrder3);
+//        }
         }
 
         protected void Application_Start()
