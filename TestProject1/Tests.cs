@@ -49,8 +49,8 @@ namespace TestProject1
             Assert.True(caught != null);
             Assert.True(caught is OrderNotReceivedException);
         }
-		
-		[Test]
+        
+        [Test]
         public void TotalPriceIsCorrect()
         {
             // Given
@@ -63,6 +63,63 @@ namespace TestProject1
             // Then
             Assert.AreEqual(46.90M, ordersPersUser.TotalPrice);
         }
-        
+
+        [Test]
+        public void GivenOrderSubmittedThenOrderStatusIsSubmitted()
+        {
+            // Given
+            var orderStatus = new GetOrderStatus();
+            orderStatus.Apply(new OrderSubmitted());
+
+            // Then
+            Assert.AreEqual(OrderStatus.Submitted, orderStatus.Status);
+        }
+
+        [Test]
+        public void GivenOrderStartedThenOrderStatusIsStarted()
+        {
+            // Given
+            var orderStatus = new GetOrderStatus();
+            orderStatus.Apply(new OrderStarted());
+
+            // Then
+            Assert.AreEqual(OrderStatus.Started, orderStatus.Status);
+        }
+
+        [Test]
+        public void GivenOrderPreparedThenOrderStatusIsPrepared()
+        {
+            // Given
+            var orderStatus = new GetOrderStatus();
+            orderStatus.Apply(new OrederPrepared());
+
+            // Then
+            Assert.AreEqual(OrderStatus.Prepared, orderStatus.Status);
+        }
+
+        [Test]
+        public void GivenOrderInTransitThenOrderStatusIsInTransit()
+        {
+            // Given
+            var orderStatus = new GetOrderStatus();
+            orderStatus.Apply(new OrderPickedUp());
+
+            // Then
+            Assert.AreEqual(OrderStatus.InTransit, orderStatus.Status);
+        }
+
+        [Test]
+        public void GivenFoodDeliveredThenOrderStatusIsDelivered()
+        {
+            // Given
+            var orderStatus = new GetOrderStatus();
+            orderStatus.Apply(new FoodDelivered());
+
+            // Then
+            Assert.AreEqual(OrderStatus.Delivered, orderStatus.Status);
+        }
+
     }
+
+    
 }

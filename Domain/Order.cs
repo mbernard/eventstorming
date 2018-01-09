@@ -38,6 +38,66 @@ namespace Domain
         }
     }
 
+    public enum OrderStatus
+    {
+        Submitted,
+        Received,
+        Started,
+        Prepared,
+        InTransit,
+        Delivered
+    }
+
+    public class OrderPickedUp
+    {
+        
+    }
+
+    public class GetOrderStatus
+    {
+        public void Apply(OrderSubmitted orderSubmitted)
+        {
+            this.Status = OrderStatus.Submitted;
+        }
+
+        public OrderStatus Status { get; set; }
+
+        public void Apply(OrderReceived orderReceived)
+        {
+            this.Status = OrderStatus.Received;
+        }
+
+        public void Apply(OrderStarted orderStarted)
+        {
+            this.Status = OrderStatus.Started;
+        }
+
+        public void Apply(OrederPrepared orederPrepared)
+        {
+            this.Status = OrderStatus.Prepared;
+        }
+
+        public void Apply(OrderPickedUp orderPickedUp)
+        {
+            this.Status = OrderStatus.InTransit;
+        }
+
+        public void Apply(FoodDelivered foodDelivered)
+        {
+            this.Status = OrderStatus.Delivered;
+
+        }
+    }
+
+    public class FoodDelivered
+    {
+        
+    }
+
+    public class OrederPrepared
+    {
+    }
+
     public class OrdersPerUser
     {
         public DateTime OrderDate { get; set; }
@@ -64,6 +124,10 @@ namespace Domain
     }
 
     public class OrderReceived
+    {
+    }
+
+    public class OrderStarted
     {
     }
 
