@@ -9,7 +9,14 @@ using Domain;
 namespace Web.Controllers
 {
     public class OrderController : Controller
+
     {
+        [HttpGet]
+
+        public ActionResult List()
+        {
+            return View();
+        }
         [HttpGet]
         public ActionResult Index(string id)
         {
@@ -51,17 +58,26 @@ namespace Web.Controllers
             var orderId = $"order-{Guid.NewGuid()}";
             MvcApplication.CommandExecutor.Execute<Order>(orderId, new CreateOrder(orderId));
 
-            return RedirectToAction("Index", orderId);
+            return RedirectToAction("Index", "Order", new {id = orderId});
         }
         
         [HttpPost]
-        public ActionResult AddItsmteToOrder(string orderId, string name, decimal price)
+        public ActionResult AddItemToOrder(string orderId, string name, decimal price)
         {
             MvcApplication.CommandExecutor.Execute<Order>(orderId, new AddItemToOrder(name, price));
 
-            return RedirectToAction("Index", orderId);
+            return RedirectToAction("Index", "Order", new {id = orderId});
+
         }
         
+
+        [HttpPost]
+        public ActionResult SubmitOrder(string orderId)
+        {
+            MvcApplication.CommandExecutor.Execute<Order>(orderId, new SubmitOrder());
+
+            return RedirectToAction("Index", "Order", new {id = orderId});
+        }
         
         
     }
