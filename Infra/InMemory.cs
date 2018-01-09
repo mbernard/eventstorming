@@ -35,13 +35,16 @@ namespace Infra
             this.handlers = handlers;
         }
 
-        public void Execute<TCommand>(IAggregate aggregate, TCommand command)
+        public void Execute<TAggregate>(string aggregateId, object command) where TAggregate : IAggregate, new()
         {
-            var events = eventStore.ReadEvents(aggregate.Id);
+            if (string.IsNullOrEmpty(aggregateId)) throw new ArgumentException("aggregateId is missing.");
+            
+            var aggregate = new TAggregate();
+            var events = eventStore.ReadEvents(aggregateId);
             foreach (var @event in events) aggregate.Hydrate(@event);
 
             var newEvents = aggregate.Execute(command);
-            eventStore.SaveEvents(aggregate.Id, newEvents);
+            eventStore.SaveEvents(aggregateId, newEvents);
             Publish(newEvents);
         }
 

@@ -169,5 +169,22 @@ namespace TestProject1
             // Then
             Assert.AreEqual(OrderStatus.Delivered, orderStatus.Status);
         }
+
+        [Test]
+        public void ConfirmDelivery()
+        {
+            // Given
+            var order = new Order();
+            order.Hydrate(new OrderPrepared());
+            order.Hydrate(new OrderPickedUp());
+            
+            // When
+            //var events = order.Execute(new ConfirmDelivery());
+
+            // Then
+            //Assert.True(events.Count() == 1);
+            //Assert.True(events.First() is FoodDelivered);
+            //TODO
+        }
     }
 }

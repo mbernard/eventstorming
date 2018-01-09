@@ -18,7 +18,7 @@ namespace TestProject1
                 events.Add
             });
             var command = new DoSomething();
-            commandExecutor.Execute(new Something(), command);
+            commandExecutor.Execute<Something>(Guid.NewGuid().ToString(), command);
             
             Assert.True(events.Count == 1);
             Assert.True(events.First() is DidSomething);
