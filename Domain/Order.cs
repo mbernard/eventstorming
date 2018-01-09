@@ -80,7 +80,7 @@ namespace Domain
             return new object[]
             {
                 new OrderPaid(payOrder.OrderId, payOrder.Amount),
-                new OrderSubmitted { OrderId = payOrder.OrderId, Date = DateTime.Now},
+                new OrderSubmitted_V2 { OrderId = payOrder.OrderId, Date = DateTime.Now},
             };
         }
 
@@ -143,6 +143,8 @@ namespace Domain
         {
             if (@event is OrderCreated)
                 this.OnOrderCreated((OrderCreated) @event);
+            if(@event is OrderSubmitted_V2)
+                OnOrderSubmitted_V2((OrderSubmitted_V2) @event);
             if (@event is OrderSubmitted)
                 OnOrderSubmitted((OrderSubmitted) @event);
             if (@event is OrderStarted)
@@ -158,6 +160,11 @@ namespace Domain
         private void OnItemAddedToOrder(ItemAddedToOrder @event)
         {
             this.items.Add(@event.Name);
+        }
+
+        private void OnOrderSubmitted_V2(OrderSubmitted_V2 @event)
+        {
+            Status = OrderStatus.Submitted;
         }
 
         private void OnOrderPaid(OrderPaid @event)
@@ -212,6 +219,12 @@ namespace Domain
         {
             Status = OrderStatus.Submitted;
         }
+
+        public void Apply(OrderSubmitted_V2 orderSubmitted)
+        {
+            Status = OrderStatus.Submitted;
+        }
+
 
         public void Apply(OrderStarted orderStarted)
         {
@@ -298,6 +311,13 @@ namespace Domain
 
 
     public class OrderSubmitted
+    {
+        public string OrderId { get; set; }
+        public DateTime Date { get; set; }
+        public string Address { get; set; }
+    }
+
+    public class OrderSubmitted_V2
     {
         public string OrderId { get; set; }
         public DateTime Date { get; set; }

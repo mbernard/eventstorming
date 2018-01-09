@@ -6,7 +6,7 @@ namespace Domain
     {
         private IDictionary<string, (string Address, OrderStatus Status)> _deliveries = new Dictionary<string, (string, OrderStatus)>();
         
-        public void Apply(OrderSubmitted orderSubmitted)
+        public void Apply(OrderSubmitted_V2 orderSubmitted)
         {
             _deliveries.Add(orderSubmitted.OrderId, (orderSubmitted.Address, OrderStatus.Submitted));
         }
