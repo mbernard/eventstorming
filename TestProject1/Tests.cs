@@ -49,8 +49,8 @@ namespace TestProject1
             Assert.True(caught != null);
             Assert.True(caught is OrderNotReceivedException);
         }
-		
-		[Test]
+        
+        [Test]
         public void TotalPriceIsCorrect()
         {
             // Given

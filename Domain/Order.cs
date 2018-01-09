@@ -61,11 +61,6 @@ namespace Domain
         Delivered
     }
 
-    public class OrderPickedUp
-    {
-        
-    }
-
     public class GetOrderStatus
     {
         public void Apply(OrderSubmitted orderSubmitted)
