@@ -53,6 +53,7 @@ namespace Domain
             {
                 new ItemAddedToOrder
                 {
+                    OrderId = this.OrderId,
                     Name = order.Name,
                     Price = order.Price
                 }
@@ -254,6 +255,7 @@ namespace Domain
 
     public class ItemAddedToOrder
     {
+        public string OrderId { get; set; }
         public string Name { get; set; }
         public decimal Price { get; set; }
     }
