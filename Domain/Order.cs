@@ -21,7 +21,18 @@ namespace Domain
             {
                 return StartFoodPreparation((StartFoodPreparation) order);
             }
+
+            if (order is PickUpOrderForDelivery)
+            {
+                return PickUpOrder((PickUpOrderForDelivery) order);
+            }
+
             throw new InvalidOperationException("Unknown command.");
+        }
+
+        private IEnumerable<object> PickUpOrder(PickUpOrderForDelivery order)
+        {
+            return new[] {new OrderPickedUp()};
         }
 
         private IEnumerable<object> StartFoodPreparation(StartFoodPreparation order)
@@ -179,6 +190,9 @@ namespace Domain
     }
 
     public class StartFoodPreparation
+    {
+    }
+    public class PickUpOrderForDelivery
     {
     }
 }

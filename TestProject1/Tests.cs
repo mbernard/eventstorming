@@ -169,5 +169,19 @@ namespace TestProject1
             // Then
             Assert.AreEqual(OrderStatus.Delivered, orderStatus.Status);
         }
+
+        [Test]
+        public void OrderPickedUp()
+        {
+            var order = new Order();
+            order.Hydrate(new OrderSubmitted());
+            order.Hydrate(new OrderStarted());
+            order.Hydrate(new OrderPrepared());
+
+            var events = order.Execute(new PickUpOrderForDelivery());
+
+            Assert.True(events.Count() == 1);
+            Assert.True(events.First() is OrderPickedUp);
+        }
     }
 }
