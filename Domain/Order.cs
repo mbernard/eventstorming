@@ -8,6 +8,7 @@ namespace Domain
     public class Order
     {
         private bool received;
+        private bool pickedUp;
 
         public IEnumerable<object> Execute(object order)
         {
@@ -23,6 +24,11 @@ namespace Domain
                 throw new OrderNotReceivedException("Order not received.");
             }
 
+            if (pickedUp)
+            {
+                throw new Exception("Cannot cancel pickedup order");
+            }
+
             return new[] {new OrderCanceled()};
         }
 
@@ -30,6 +36,13 @@ namespace Domain
         {
             if (@event is OrderReceived)
                 this.OnOrderReceived((OrderReceived) @event);
+            if (@event is OrderPickedUp)
+                this.OnOrderPickedUp((OrderPickedUp)@event);
+        }
+
+        private void OnOrderPickedUp(OrderPickedUp @event)
+        {
+            pickedUp = true;
         }
 
         private void OnOrderReceived(OrderReceived @event)
@@ -92,5 +105,9 @@ namespace Domain
     {
         public string Name { get; set; }
         public decimal Price { get; set; }
+    }
+
+    public class OrderPickedUp
+    {
     }
 }

@@ -63,6 +63,15 @@ namespace TestProject1
             // Then
             Assert.AreEqual(46.90M, ordersPersUser.TotalPrice);
         }
-        
+
+        [Test]
+        public void CannotCancelPickedUpOrder()
+        {
+            var order = new Order();
+            order.Hydrate(new OrderReceived());
+            order.Hydrate(new OrderPickedUp());
+
+            Assert.Catch<Exception>(() => order.Execute(new CancelOrder("1")));
+        }
     }
 }
