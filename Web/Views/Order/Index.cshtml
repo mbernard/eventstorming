@@ -1,4 +1,5 @@
-﻿@{
+﻿@model Domain.OrderPerUser
+@{
     Layout = null;
 }
 
@@ -10,12 +11,22 @@
     <title></title>
 </head>
 <body>
-    <div>
-        @using (Html.BeginForm("CancelOrder", "Order", FormMethod.Post))
+<div>
+    <p>Order Date: @Model.OrderDate.ToString("D")</p>
+    <p>Items:</p>
+    <ul>
+        @foreach (var item in Model.Items)
         {
-            @Html.Hidden("OrderId", "1")
-            <input type="submit" value="Cancel Order" />
+            <li>@item.Name - @item.Price</li>
         }
-    </div>
+    </ul>
+    <p>Total Price: @Model.TotalPrice</p>
+
+    @using (Html.BeginForm("CancelOrder", "Order", FormMethod.Post))
+    {
+        @Html.Hidden("OrderId", "1")
+        <input type="submit" value="Cancel Order"/>
+    }
+</div>
 </body>
 </html>

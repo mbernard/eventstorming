@@ -13,7 +13,19 @@ namespace Web.Controllers
         [HttpGet]
         public ActionResult Index()
         {
-            return this.View("Index");
+            var orderPerUser = new OrderPerUser
+            {
+                OrderDate = DateTime.Now.AddDays(-3),
+                Items = new List<(string Name, decimal Price)>
+                {
+                    ("Pizza", 10.00m),
+                    ("Fries", 2.00m),
+                    ("Coke", 1.00m)
+                },
+                TotalPrice = 13.00m
+            };
+
+            return this.View("Index", orderPerUser);
         }
 
         [HttpPost]

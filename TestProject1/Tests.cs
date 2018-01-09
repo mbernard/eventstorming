@@ -55,7 +55,7 @@ namespace TestProject1
         {
             // Given
             // When
-            var ordersPersUser = new OrdersPerUser();
+            var ordersPersUser = new OrderPerUser();
             ordersPersUser.Apply(new ItemAddedToOrder {Name = "Item1", Price = 12.34M});
             ordersPersUser.Apply(new ItemAddedToOrder {Name = "Item2", Price = 34.56M});
             ordersPersUser.Apply(new OrderSubmitted {Date = new DateTime(2010, 10, 10)});

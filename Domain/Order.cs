@@ -38,7 +38,7 @@ namespace Domain
         }
     }
 
-    public class OrdersPerUser
+    public class OrderPerUser
     {
         public DateTime OrderDate { get; set; }
 
