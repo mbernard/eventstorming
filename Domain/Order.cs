@@ -10,17 +10,11 @@ namespace Domain
         public IEnumerable<object> Execute(object order)
         {
             if (order is CancelOrder)
-            {
                 return CancelOrder((CancelOrder) order);
-            }
             if (order is FinishOrder)
-            {
-                //return FinishOrder((FinishOrder) order);
-            }
+                return FinishOrder((FinishOrder) order);
             if (order is StartFoodPreparation)
-            {
                 return StartFoodPreparation((StartFoodPreparation) order);
-            }
             throw new InvalidOperationException("Unknown command.");
         }
 
@@ -29,14 +23,25 @@ namespace Domain
             return new[] {new OrderStarted()};
         }
 
+        private IEnumerable<object> FinishOrder(FinishOrder finishOrder)
+        {
+            if (Status == OrderStatus.Started)
+                return new[] {new OrderPrepared()};
+
+            throw new InvalidOperationException("Cannot finish an unstarted order");
+        }
+
+
         private IEnumerable<object> CancelOrder(CancelOrder cancelOrder)
         {
             switch (Status)
             {
+                case OrderStatus.None:
+                    throw new OrderNotSubmittedException("Order not submitted.");
                 case OrderStatus.Submitted:
                 case OrderStatus.Started:
                 case OrderStatus.Prepared:
-                    return new[] { new OrderCanceled() };
+                    return new[] {new OrderCanceled()};
                 case OrderStatus.PickedUp:
                     throw new Exception("Cannot cancel pickedup order");
                 case OrderStatus.Delivered:
@@ -50,23 +55,31 @@ namespace Domain
         {
             if (@event is OrderSubmitted)
                 OnOrderSubmitted((OrderSubmitted) @event);
+            if (@event is OrderStarted)
+                OnOrderStarted((OrderStarted) @event);
             if (@event is OrderPickedUp)
                 OnOrderPickedUp((OrderPickedUp) @event);
         }
 
+        private void OnOrderStarted(OrderStarted @event)
+        {
+            Status = OrderStatus.Started;
+        }
+
         private void OnOrderPickedUp(OrderPickedUp @event)
         {
-            this.Status = OrderStatus.PickedUp;
+            Status = OrderStatus.PickedUp;
         }
 
         private void OnOrderSubmitted(OrderSubmitted @event)
         {
-            this.Status = OrderStatus.Submitted;
+            Status = OrderStatus.Submitted;
         }
     }
 
     public enum OrderStatus
     {
+        None,
         Submitted,
         Started,
         Prepared,
@@ -76,7 +89,6 @@ namespace Domain
 
     public class GetOrderStatus
     {
-
         public OrderStatus Status { get; set; }
 
         public void Apply(OrderSubmitted orderSubmitted)
@@ -107,7 +119,6 @@ namespace Domain
 
     public class FoodDelivered
     {
-        
     }
 
     public class OrderPrepared
@@ -138,7 +149,7 @@ namespace Domain
     public class OrderCanceled
     {
     }
-    
+
     public class FinishOrder
     {
     }
@@ -146,7 +157,8 @@ namespace Domain
     public class OrderNotSubmittedException : Exception
     {
         public OrderNotSubmittedException(string message) : base(message)
-        { }
+        {
+        }
     }
 
     public class CancelOrder
