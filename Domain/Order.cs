@@ -44,6 +44,11 @@ namespace Domain
             {
                 return PayOrder((PayOrder) order);
             }
+            
+            if (order is SubmitOrder)
+            {
+                return SubmitOrder((SubmitOrder) order);
+            }
 
             if (order is RemoveItemFromOrder)
                 return RemoveItemFromOrder((RemoveItemFromOrder) order);
@@ -75,6 +80,16 @@ namespace Domain
             };
         }
 
+        
+        private IEnumerable<object> SubmitOrder(SubmitOrder submitOrder)
+        {
+            return new object[]
+            {
+                new OrderSubmitted_V2 { OrderId = this.OrderId, Date = DateTime.Now},
+            };
+        }
+
+        
         private IEnumerable<object> PayOrder(PayOrder payOrder)
         {
             return new object[]

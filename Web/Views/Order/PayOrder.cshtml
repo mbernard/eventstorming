@@ -28,5 +28,15 @@
         <input type="submit" value="Confirm & Pay" />
     }
 </div>
+<div>
+    @using (Html.BeginForm("PayOnDeliveryOrder", "Order", FormMethod.Post))
+    {
+        @Html.Hidden("OrderId", @Model.OrderId)
+        @Html.Hidden("Amount", @Model.TotalPrice)
+
+        <input type="submit" value="Confirm & Pay On Delivery" />
+    }
+</div>
+
 </body>
 </html>
