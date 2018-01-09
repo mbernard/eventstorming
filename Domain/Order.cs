@@ -388,4 +388,9 @@ namespace Domain
         public string OrderId { get; set; }
         public string Name { get; set; }
     }
+
+    public class OrderPaidOnDelivery
+    {
+        public string OrderId { get; set; }
+    }
 }
