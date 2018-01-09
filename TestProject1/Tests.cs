@@ -206,5 +206,19 @@ namespace TestProject1
             Assert.True(events.Count() == 1);
             Assert.True(events.First() is OrderCreated);
         }
+
+        [Test]
+        public void AddItem()
+        {
+            var order = new Order();
+            order.Hydrate(new OrderCreated("1"));
+
+            var events = order.Execute(new AddItemToOrder("Potato", 15.00M));
+
+            Assert.True(events.Count() == 1);
+            Assert.True(events.First() is ItemAddedToOrder);
+            Assert.True(((ItemAddedToOrder)events.First()).Name == "Potato");
+            Assert.True(((ItemAddedToOrder)events.First()).Price == 15.00M);
+        }
     }
 }
