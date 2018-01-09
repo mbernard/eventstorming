@@ -195,5 +195,16 @@ namespace TestProject1
             //Assert.True(events.First() is FoodDelivered);
             //TODO
         }
+
+        [Test]
+        public void OrderCreated()
+        {
+            var order = new Order();
+
+            var events = order.Execute(new CreateOrder("1"));
+
+            Assert.True(events.Count() == 1);
+            Assert.True(events.First() is OrderCreated);
+        }
     }
 }
