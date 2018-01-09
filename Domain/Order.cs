@@ -11,11 +11,6 @@ namespace Domain
         {
         }
 
-        public Order(string id)
-        {
-            this.Id = id;
-        }
-
         private bool received;
         private bool pickedUp;
         private OrderStatus Status;
@@ -38,6 +33,9 @@ namespace Domain
             {
                 return PickUpOrder((PickUpOrderForDelivery) order);
             }
+
+            if (order is ConfirmDelivery)
+                return ConfirmDelivery((ConfirmDelivery) order);
 
             if (order is AddItemToOrder)
             {
@@ -108,6 +106,14 @@ namespace Domain
             return new[]
             {
                 new OrderSubmitted()
+            };
+        }
+
+        private IEnumerable<object> ConfirmDelivery(ConfirmDelivery confirmDelivery)
+        {
+            return new[]
+            {
+                new FoodDelivered()
             };
         }
 
@@ -271,10 +277,11 @@ namespace Domain
     {
     }
 
+    public class ConfirmDelivery
+    {
 
     public class AddItemToOrder
     {
-        public string Id { get; }
         public string Name { get; }
         public decimal Price { get; }
 

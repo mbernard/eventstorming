@@ -188,12 +188,11 @@ namespace TestProject1
             order.Hydrate(new OrderPickedUp());
             
             // When
-            //var events = order.Execute(new ConfirmDelivery());
+            var events = order.Execute(new ConfirmDelivery());
 
             // Then
-            //Assert.True(events.Count() == 1);
-            //Assert.True(events.First() is FoodDelivered);
-            //TODO
+            Assert.True(events.Count() == 1);
+            Assert.True(events.First() is FoodDelivered);
         }
 
         [Test]
