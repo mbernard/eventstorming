@@ -191,7 +191,6 @@ namespace TestProject1
         public void TotalPriceIsCorrect()
         {
             // Given
-            // When
             var ordersPersUser = new OrderPerUser();
             ordersPersUser.Apply(new ItemAddedToOrder {Name = "Item1", Price = 12.34M});
             ordersPersUser.Apply(new ItemAddedToOrder {Name = "Item2", Price = 34.56M});
@@ -201,6 +200,33 @@ namespace TestProject1
             Assert.AreEqual(46.90M, ordersPersUser.TotalPrice);
         }
 
+        [Test]
+        public void RemoveItem2()
+        {
+            // Given
+            var ordersPersUser = new OrderPerUser();
+            ordersPersUser.Apply(new ItemAddedToOrder {Name = "Item1", Price = 12.34M});
+            ordersPersUser.Apply(new ItemRemovedFromOrder {Name = "Item1"});
+
+            // Then
+            Assert.IsTrue(ordersPersUser.Items.Count == 0);
+            Assert.AreEqual(0M, ordersPersUser.TotalPrice);
+        }
+        
+        [Test]
+        public void RemoveItem3()
+        {
+            // Given
+            var ordersPersUser = new OrderPerUser();
+            ordersPersUser.Apply(new ItemAddedToOrder {Name = "Item1", Price = 12.34M});
+            ordersPersUser.Apply(new ItemAddedToOrder {Name = "Item1", Price = 12.34M});
+            ordersPersUser.Apply(new ItemRemovedFromOrder {Name = "Item1"});
+
+            // Then
+            Assert.IsTrue(ordersPersUser.Items.Count == 1);
+            Assert.AreEqual(12.34M, ordersPersUser.TotalPrice);
+        }
+        
         [Test]
         public void OrderPickedUp()
         {
@@ -263,7 +289,7 @@ namespace TestProject1
             order.Hydrate(new OrderCreated("3"));
             order.Hydrate(new ItemAddedToOrder {OrderId = "3", Name = "Un Item"});
 
-            var events = order.Execute(new RemoveItemFromOrder {OrderId = "3", Name = "Un Item"});
+            var events = order.Execute(new RemoveItemFromOrder {Name = "Un Item"});
             
             Assert.True(events.Count() == 1);
             Assert.True(events.First() is ItemRemovedFromOrder);

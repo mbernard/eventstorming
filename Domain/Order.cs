@@ -71,7 +71,7 @@ namespace Domain
             
             return new[]
             {
-                new ItemRemovedFromOrder {OrderId = removeItemFromOrder.OrderId, Name = removeItemFromOrder.Name}
+                new ItemRemovedFromOrder {OrderId = this.OrderId, Name = removeItemFromOrder.Name}
             };
         }
 
@@ -380,7 +380,6 @@ namespace Domain
 
     public class RemoveItemFromOrder
     {
-        public string OrderId { get; set; }
         public string Name { get; set; }
     }
 

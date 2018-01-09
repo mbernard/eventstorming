@@ -27,6 +27,13 @@ namespace Domain
                     var orderPerUser = orderPerUserRepository.GetForOrder(itemAdded.OrderId);
                     orderPerUser.Apply(itemAdded);
                 }
+                
+                if (@event is  ItemRemovedFromOrder)
+                {
+                    var itemRemoved = (ItemRemovedFromOrder) @event;
+                    var orderPerUser = orderPerUserRepository.GetForOrder(itemRemoved.OrderId);
+                    orderPerUser.Apply(itemRemoved);
+                }
             };
         };
     }
