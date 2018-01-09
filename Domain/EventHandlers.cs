@@ -20,6 +20,13 @@ namespace Domain
                             OrderId = ((OrderCreated)@event).OrderId
                         });
                 }
+
+                if (@event is  ItemAddedToOrder)
+                {
+                    var itemAdded = (ItemAddedToOrder) @event;
+                    var orderPerUser = orderPerUserRepository.GetForOrder(itemAdded.OrderId);
+                    orderPerUser.Apply(itemAdded);
+                }
             };
         };
     }

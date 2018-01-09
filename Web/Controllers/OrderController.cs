@@ -44,5 +44,25 @@ namespace Web.Controllers
         {
             return this.View("OrderCancellationConfirmation");
         }
+
+        [HttpPost]
+        public ActionResult CreateOrder()
+        {
+            var orderId = $"order-{Guid.NewGuid()}";
+            MvcApplication.CommandExecutor.Execute<Order>(orderId, new CreateOrder(orderId));
+
+            return RedirectToAction("Index", orderId);
+        }
+        
+        [HttpPost]
+        public ActionResult AddItsmteToOrder(string orderId, string name, decimal price)
+        {
+            MvcApplication.CommandExecutor.Execute<Order>(orderId, new AddItemToOrder(name, price));
+
+            return RedirectToAction("Index", orderId);
+        }
+        
+        
+        
     }
 }
