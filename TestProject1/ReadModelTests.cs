@@ -13,12 +13,13 @@ namespace TestProject1
         {
             //Given
             var outstandingOrders = new OutstandingOrders();
-            outstandingOrders.Apply(new OrderSubmitted {OrderId = "3", Date = DateTime.Now});
+            
             outstandingOrders.Apply(new ItemAddedToOrder {OrderId = "3", Name = "Pizza", Price = 2});
             outstandingOrders.Apply(new ItemAddedToOrder {OrderId = "3", Name = "Burger", Price = 1});
-            outstandingOrders.Apply(new OrderSubmitted {OrderId = "5", Date = DateTime.Now});
+            outstandingOrders.Apply(new OrderSubmitted {OrderId = "3", Date = DateTime.Now});
             outstandingOrders.Apply(new ItemAddedToOrder {OrderId = "5", Name = "Chicken Wings", Price = 1});
             outstandingOrders.Apply(new ItemAddedToOrder {OrderId = "5", Name = "Poutine", Price = 2});
+            outstandingOrders.Apply(new OrderSubmitted {OrderId = "5", Date = DateTime.Now});
             
             //When
             outstandingOrders.Apply(new OrderCanceled {OrderId = "3"});
@@ -27,7 +28,7 @@ namespace TestProject1
             Assert.True(outstandingOrders.Orders.Count() == 1);
             var firstOrder = outstandingOrders.Orders.First();
             Assert.True(firstOrder.Key == "5");
-            Assert.True(firstOrder.Value.Status == "NotStarted");
+            Assert.True(firstOrder.Value.Status != OrderStatus.Started);
             var firstOrderItems = firstOrder.Value.Items;
             Assert.True(firstOrderItems.First() == "Chicken Wings");
             Assert.True(firstOrderItems.ElementAt(1) == "Poutine");

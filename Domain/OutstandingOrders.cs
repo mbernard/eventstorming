@@ -42,10 +42,5 @@ namespace Domain
         {
             this._orders.Remove(orderCanceled.OrderId);
         }
-
-        public void Apply(OrderCanceled orderCanceled)
-        {
-            
-        }
     }
 }
