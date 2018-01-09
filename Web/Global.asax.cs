@@ -12,10 +12,11 @@ namespace Web
     public class MvcApplication : HttpApplication
     {
         public static readonly OrderPerUserRepository OrderPerUserRepository = new OrderPerUserRepository();
-
+        public static readonly OutstandingOrders OutstandinOrders = new OutstandingOrders();
         public static readonly CommandExecutor CommandExecutor = new CommandExecutor(new[]
             {
-                EventHandlers.OnOrderCreatedEventHandler(OrderPerUserRepository)
+                EventHandlers.OnOrderCreatedEventHandler(OrderPerUserRepository),
+                EventHandlers.OutstandingOrdersEventHandlers(OutstandinOrders)
             },
             new List<Func<object, object>> {OrderSubmittedMapper});
 

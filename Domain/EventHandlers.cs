@@ -36,5 +36,36 @@ namespace Domain
                 }
             };
         };
+
+        public static Func<OutstandingOrders, Action<object>> OutstandingOrdersEventHandlers =  outstandingOrders =>
+        {
+            return @event =>
+            {
+                if (@event is ItemAddedToOrder)
+                {
+                    outstandingOrders.Apply((ItemAddedToOrder)@event);
+                }
+
+                if (@event is OrderSubmitted_V2)
+                {
+                    outstandingOrders.Apply((OrderSubmitted_V2)@event);
+                }
+
+                if (@event is OrderCanceled)
+                {
+                    outstandingOrders.Apply((OrderCanceled)@event);
+                }
+
+                if (@event is OrderPrepared)
+                {
+                    outstandingOrders.Apply((OrderPrepared)@event);
+                }
+
+                if (@event is OrderStarted)
+                {
+                    outstandingOrders.Apply((OrderStarted)@event);
+                }
+            };
+        };
     }
 }

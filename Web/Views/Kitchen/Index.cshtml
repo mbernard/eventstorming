@@ -1,0 +1,59 @@
+﻿@using Domain
+@model Domain.OutstandingOrders
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title></title>
+</head>
+<body>
+<div>
+    <h1>Outstanding Orders:</h1>
+    <ul>
+        @foreach (var order in Model.Orders)
+        {
+        <li>
+            <b>Order ID:</b> @order.Key <br />
+            <b>Order Status:</b> @order.Value.Status <br />
+            <b>Items:</b> <br />
+            <ul>
+                @foreach (var item in order.Value.Items)
+        {
+            <li>@item</li>
+}
+            </ul>
+            @{
+                switch (@order.Value.Status)
+                {
+                    case OrderStatus.Submitted:
+                        using(Html.BeginForm("StartOrderPreperation", "Kitchen", FormMethod.Post))
+                         {
+                             @Html.Hidden("id", @order.Key)
+                             <input type="submit" value="Prepare"/>
+                         }
+                        break;
+                    case OrderStatus.Started:
+                        using(Html.BeginForm("FinishOrder", "Kitchen", FormMethod.Post))
+                        {
+                            @Html.Hidden("id", @order.Key)
+                            <input type="submit" value="Done"/>
+                        }
+                        using(Html.BeginForm("CancelOrder", "Kitchen", FormMethod.Post))
+                        {
+                            @Html.Hidden("id", @order.Key)
+                            <input type="submit" value="Cancel"/>
+                        }
+                    break;
+                }
+            }
+        </li>
+        }
+    </ul>
+</div>
+</body>
+</html>
