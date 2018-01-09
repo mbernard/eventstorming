@@ -140,6 +140,24 @@ namespace TestProject1
         }
 
         [Test]
+        public void PreparedOrderIsRemovedFromOutstandingOrders()
+        {
+            // Given
+            var outstandingOrders = new OutstandingOrders();
+            outstandingOrders.Apply(new ItemAddedToOrder { OrderId = "3", Name = "Hamburger", Price = 5 });
+            outstandingOrders.Apply(new ItemAddedToOrder { OrderId = "3", Name = "Pizza", Price = 5 });
+            outstandingOrders.Apply(new OrderSubmitted { OrderId = "3" });
+            outstandingOrders.Apply(new ItemAddedToOrder { OrderId = "5", Name = "Chicken Wings", Price = 10 });
+            outstandingOrders.Apply(new OrderSubmitted{ OrderId = "5" });
+            outstandingOrders.Apply(new OrderPrepared{ OrderId = "5" });
+
+            // When
+            // Then
+            Assert.AreEqual(1, outstandingOrders.Orders.Count);
+            Assert.AreEqual("3", outstandingOrders.Orders.First().Key);
+        }
+
+        [Test]
         public void StartFoodPrep()
         {
             var order = new Order();
