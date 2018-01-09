@@ -207,6 +207,10 @@
       <Project>{7b33f3ca-eb52-4530-9fbf-6002b52c5041}</Project>
       <Name>Domain</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Infra\Infra.csproj">
+      <Project>{014931f1-4f2c-47d1-8f6a-bb84533c7728}</Project>
+      <Name>Infra</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

@@ -3,15 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
+using Infra;
+
 namespace Domain
 {
-    public class Order
+    public class Order : IAggregate
     {
         private bool received;
         private bool pickedUp;
 
         public IEnumerable<object> Execute(object order)
         {
+            if (order is SubmitOrder)
+                return this.ReceiveOrder((SubmitOrder)order);
             if (order is CancelOrder)
                 return this.CancelOrder((CancelOrder) order);
             throw new InvalidOperationException("Unknown command.");
@@ -32,6 +36,16 @@ namespace Domain
             return new[] {new OrderCanceled()};
         }
 
+        private IEnumerable<object> ReceiveOrder(SubmitOrder submitOrder)
+        {
+            return new[]
+            {
+                new OrderReceived(Guid.NewGuid().ToString())
+            };
+        }
+
+        public string Id { get; set; }
+
         public void Hydrate(object @event)
         {
             if (@event is OrderReceived)
@@ -48,6 +62,16 @@ namespace Domain
         private void OnOrderReceived(OrderReceived @event)
         {
             this.received = true;
+        }
+    }
+
+    public class SubmitOrder
+    {
+        public string OrderId { get; }
+
+        public SubmitOrder(string orderId)
+        {
+            this.OrderId = orderId;
         }
     }
 
@@ -78,6 +102,12 @@ namespace Domain
 
     public class OrderReceived
     {
+        public string OrderId { get; }
+
+        public OrderReceived(string orderId)
+        {
+            this.OrderId = orderId;
+        }
     }
 
     public class OrderNotReceivedException : Exception
