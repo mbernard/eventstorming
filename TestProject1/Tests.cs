@@ -49,13 +49,13 @@ namespace TestProject1
             Assert.True(caught != null);
             Assert.True(caught is OrderNotReceivedException);
         }
-        
-        [Test]
+		
+		[Test]
         public void TotalPriceIsCorrect()
         {
             // Given
             // When
-            var ordersPersUser = new OrdersPerUser();
+            var ordersPersUser = new OrderPerUser();
             ordersPersUser.Apply(new ItemAddedToOrder {Name = "Item1", Price = 12.34M});
             ordersPersUser.Apply(new ItemAddedToOrder {Name = "Item2", Price = 34.56M});
             ordersPersUser.Apply(new OrderSubmitted {Date = new DateTime(2010, 10, 10)});
@@ -73,6 +73,16 @@ namespace TestProject1
 
             // Then
             Assert.AreEqual(OrderStatus.Submitted, orderStatus.Status);
+        }
+
+        [Test]
+        public void CannotCancelPickedUpOrder()
+        {
+            var order = new Order();
+            order.Hydrate(new OrderReceived());
+            order.Hydrate(new OrderPickedUp());
+
+            Assert.Catch<Exception>(() => order.Execute(new CancelOrder("1")));
         }
 
         [Test]
@@ -118,8 +128,5 @@ namespace TestProject1
             // Then
             Assert.AreEqual(OrderStatus.Delivered, orderStatus.Status);
         }
-
     }
-
-    
 }
