@@ -14,16 +14,13 @@ namespace Web
 {
     public class MvcApplication : System.Web.HttpApplication
     {
-        public static readonly CommandExecutor CommandExecutor = new CommandExecutor(new []
-        {
-            () => 
-        });
+        public static readonly CommandExecutor CommandExecutor = new CommandExecutor(Enumerable.Empty<Action<object>>());
 
         static MvcApplication()
         {
-            CommandExecutor.Execute(new Order(), new SubmitOrder());
-            CommandExecutor.Execute(new Order(), new SubmitOrder());
-            CommandExecutor.Execute(new Order(), new SubmitOrder());
+            CommandExecutor.Execute(new Order(), new CreateOrder("1"));
+            CommandExecutor.Execute(new Order(), new CreateOrder("2"));
+            CommandExecutor.Execute(new Order(), new CreateOrder("3"));
         }
 
         protected void Application_Start()

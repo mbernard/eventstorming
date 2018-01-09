@@ -16,7 +16,7 @@ namespace TestProject1
         {
             //Given
             var order = new Order();
-            order.Hydrate(new OrderReceived());
+            order.Hydrate(new OrderSubmitted());
 
             //When
             var events = order.Execute(new CancelOrder("1"));
@@ -65,13 +65,80 @@ namespace TestProject1
         }
 
         [Test]
+        public void GivenOrderSubmittedThenOrderStatusIsSubmitted()
+        {
+            // Given
+            var orderStatus = new GetOrderStatus();
+            orderStatus.Apply(new OrderSubmitted());
+
+            // Then
+            Assert.AreEqual(OrderStatus.Submitted, orderStatus.Status);
+        }
+
+        [Test]
         public void CannotCancelPickedUpOrder()
         {
             var order = new Order();
-            order.Hydrate(new OrderReceived());
+            order.Hydrate(new OrderSubmitted());
             order.Hydrate(new OrderPickedUp());
 
             Assert.Catch<Exception>(() => order.Execute(new CancelOrder("1")));
+        }
+
+        [Test]
+        public void StartFoodPrep()
+        {
+            var order = new Order();
+            order.Hydrate(new OrderSubmitted());
+
+            var events = order.Execute(new StartFoodPreparation());
+
+            Assert.True(events.Count() == 1);
+            Assert.True(events.First() is OrderStarted);
+        }
+
+        [Test]
+        public void GivenOrderStartedThenOrderStatusIsStarted()
+        {
+            // Given
+            var orderStatus = new GetOrderStatus();
+            orderStatus.Apply(new OrderStarted());
+
+            // Then
+            Assert.AreEqual(OrderStatus.Started, orderStatus.Status);
+        }
+
+        [Test]
+        public void GivenOrderPreparedThenOrderStatusIsPrepared()
+        {
+            // Given
+            var orderStatus = new GetOrderStatus();
+            orderStatus.Apply(new OrderPrepared());
+
+            // Then
+            Assert.AreEqual(OrderStatus.Prepared, orderStatus.Status);
+        }
+
+        [Test]
+        public void GivenOrderInTransitThenOrderStatusIsInTransit()
+        {
+            // Given
+            var orderStatus = new GetOrderStatus();
+            orderStatus.Apply(new OrderPickedUp());
+
+            // Then
+            Assert.AreEqual(OrderStatus.InTransit, orderStatus.Status);
+        }
+
+        [Test]
+        public void GivenFoodDeliveredThenOrderStatusIsDelivered()
+        {
+            // Given
+            var orderStatus = new GetOrderStatus();
+            orderStatus.Apply(new FoodDelivered());
+
+            // Then
+            Assert.AreEqual(OrderStatus.Delivered, orderStatus.Status);
         }
     }
 }

@@ -9,16 +9,33 @@ namespace Domain
 {
     public class Order : IAggregate
     {
+        private string orderId;
         private bool received;
         private bool pickedUp;
 
         public IEnumerable<object> Execute(object order)
         {
+            if (order is CreateOrder)
+                return this.CreateOrder((CreateOrder)order);
             if (order is SubmitOrder)
-                return this.ReceiveOrder((SubmitOrder)order);
+                return this.SubmitOrder((SubmitOrder)order);
             if (order is CancelOrder)
                 return this.CancelOrder((CancelOrder) order);
+            if (order is StartFoodPreparation)
+            {
+                return StartFoodPreparation((StartFoodPreparation) order);
+            }
             throw new InvalidOperationException("Unknown command.");
+        }
+
+        private IEnumerable<object> CreateOrder(CreateOrder createOrder)
+        {
+            return new[] { new OrderCreated(createOrder.OrderId) };
+        }
+
+        private IEnumerable<object> StartFoodPreparation(StartFoodPreparation order)
+        {
+            return new[] {new OrderStarted()};
         }
 
         private IEnumerable<object> CancelOrder(CancelOrder cancelOrder)
@@ -36,11 +53,11 @@ namespace Domain
             return new[] {new OrderCanceled()};
         }
 
-        private IEnumerable<object> ReceiveOrder(SubmitOrder submitOrder)
+        private IEnumerable<object> SubmitOrder(SubmitOrder submitOrder)
         {
             return new[]
             {
-                new OrderReceived(Guid.NewGuid().ToString())
+                new OrderSubmitted()
             };
         }
 
@@ -48,10 +65,17 @@ namespace Domain
 
         public void Hydrate(object @event)
         {
-            if (@event is OrderReceived)
-                this.OnOrderReceived((OrderReceived) @event);
+            if (@event is OrderCreated)
+                this.OnOrderCreated((OrderCreated)@event);
+            if (@event is OrderSubmitted)
+                this.OnOrderReceived((OrderSubmitted) @event);
             if (@event is OrderPickedUp)
                 this.OnOrderPickedUp((OrderPickedUp)@event);
+        }
+
+        private void OnOrderCreated(OrderCreated @event)
+        {
+            orderId = @event.OrderId;
         }
 
         private void OnOrderPickedUp(OrderPickedUp @event)
@@ -59,7 +83,7 @@ namespace Domain
             pickedUp = true;
         }
 
-        private void OnOrderReceived(OrderReceived @event)
+        private void OnOrderReceived(OrderSubmitted @event)
         {
             this.received = true;
         }
@@ -67,12 +91,66 @@ namespace Domain
 
     public class SubmitOrder
     {
+    }
+
+    public enum OrderStatus
+    {
+        Submitted,
+        Received,
+        Started,
+        Prepared,
+        InTransit,
+        Delivered
+    }
+
+    public class GetOrderStatus
+    {
+        public void Apply(OrderSubmitted orderSubmitted)
+        {
+            this.Status = OrderStatus.Submitted;
+        }
+
+        public OrderStatus Status { get; set; }
+
+        public void Apply(OrderStarted orderStarted)
+        {
+            this.Status = OrderStatus.Started;
+        }
+
+        public void Apply(OrderPrepared orderPrepared)
+        {
+            this.Status = OrderStatus.Prepared;
+        }
+
+        public void Apply(OrderPickedUp orderPickedUp)
+        {
+            this.Status = OrderStatus.InTransit;
+        }
+
+        public void Apply(FoodDelivered foodDelivered)
+        {
+            this.Status = OrderStatus.Delivered;
+
+        }
+    }
+
+    public class OrderCreated
+    {
         public string OrderId { get; }
 
-        public SubmitOrder(string orderId)
+        public OrderCreated(string orderId)
         {
             this.OrderId = orderId;
         }
+    }
+
+    public class FoodDelivered
+    {
+        
+    }
+
+    public class OrderPrepared
+    {
     }
 
     public class OrderPerUser
@@ -100,13 +178,10 @@ namespace Domain
     {
     }
 
-    public class OrderReceived
+    public class OrderStarted
     {
-        public string OrderId { get; }
-
-        public OrderReceived(string orderId)
+        public OrderStarted()
         {
-            this.OrderId = orderId;
         }
     }
 
@@ -114,6 +189,16 @@ namespace Domain
     {
         public OrderNotReceivedException(string message) : base(message)
         { }
+    }
+
+    public class CreateOrder
+    {
+        public string OrderId { get; }
+
+        public CreateOrder(string orderId)
+        {
+            this.OrderId = orderId;
+        }
     }
 
     public class CancelOrder
@@ -138,6 +223,10 @@ namespace Domain
     }
 
     public class OrderPickedUp
+    {
+    }
+
+    public class StartFoodPreparation
     {
     }
 }
