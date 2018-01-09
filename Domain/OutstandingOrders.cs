@@ -1,39 +1,49 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Infra;
 
 namespace Domain
 {
     public class OutstandingOrders
     {
-        private readonly IDictionary<string, List<string>> _addedOrders = new Dictionary<string, List<string>>();
+        public readonly IDictionary<string, (List<string> Items, OrderStatus Status)> _orders =
+            new Dictionary<string, (List<string>, OrderStatus)>();
 
-        public readonly IDictionary<string, List<string>> Orders = new Dictionary<string, List<string>>();
+        public IEnumerable<KeyValuePair<string, (List<string> Items, OrderStatus Status)>> Orders =>
+            _orders.Where(x => x.Value.Status == OrderStatus.Submitted);
 
         public void Apply(ItemAddedToOrder itemAddedToOrder)
         {
-            if (this._addedOrders.ContainsKey(itemAddedToOrder.OrderId))
+            if (_orders.ContainsKey(itemAddedToOrder.OrderId))
             {
-                this._addedOrders[itemAddedToOrder.OrderId].Add(itemAddedToOrder.Name);
+                var addedOrder = _orders[itemAddedToOrder.OrderId];
+                addedOrder.Items.Add(itemAddedToOrder.Name);
             }
             else
             {
-                this._addedOrders.Add(itemAddedToOrder.OrderId, new List<string> { itemAddedToOrder.Name });
+                _orders.Add(itemAddedToOrder.OrderId, (new List<string> {itemAddedToOrder.Name}, OrderStatus.None));
             }
         }
 
         public void Apply(OrderSubmitted orderSubmitted)
         {
-            this.Orders.Add(orderSubmitted.OrderId, this._addedOrders[orderSubmitted.OrderId]);
-            this._addedOrders.Remove(orderSubmitted.OrderId);
+            var order = _orders[orderSubmitted.OrderId];
+            _orders[orderSubmitted.OrderId] = (order.Items, OrderStatus.Submitted);
         }
 
         public void Apply(OrderPrepared orderPrepared)
         {
-            this.Orders.Remove(orderPrepared.OrderId);
+            _orders.Remove(orderPrepared.OrderId);
+        }
+
+        public void Apply(OrderCanceled orderCanceled)
+        {
+            _orders.Remove(orderCanceled.OrderId);
+        }
+
+        public void Apply(OrderStarted orderStarted)
+        {
+            var order = _orders[orderStarted.OrderId];
+            _orders[orderStarted.OrderId] = (order.Items, OrderStatus.Started);
         }
     }
 }
