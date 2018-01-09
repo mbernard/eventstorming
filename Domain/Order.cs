@@ -218,6 +218,7 @@ namespace Domain
 
     public class OrderPrepared
     {
+        public string OrderId { get; set; }
     }
 
     public class OrderCanceled
@@ -256,6 +257,8 @@ namespace Domain
 
     public class OrderSubmitted
     {
+        public string OrderId { get; set; }
+
         public DateTime Date { get; set; }
     }
 
