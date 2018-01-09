@@ -1,14 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
 
+using Infra;
+
 namespace Domain
 {
-    public class Order
+    public class Order : IAggregate
     {
+        private string orderId;
+        private bool received;
+        private bool pickedUp;
         private OrderStatus Status;
 
         public IEnumerable<object> Execute(object order)
         {
+            if (order is CreateOrder)
+                return this.CreateOrder((CreateOrder)order);
+            if (order is SubmitOrder)
+                return this.SubmitOrder((SubmitOrder)order);
             if (order is CancelOrder)
                 return CancelOrder((CancelOrder) order);
             if (order is FinishOrder)
@@ -16,6 +25,11 @@ namespace Domain
             if (order is StartFoodPreparation)
                 return StartFoodPreparation((StartFoodPreparation) order);
             throw new InvalidOperationException("Unknown command.");
+        }
+
+        private IEnumerable<object> CreateOrder(CreateOrder createOrder)
+        {
+            return new[] { new OrderCreated(createOrder.OrderId) };
         }
 
         private IEnumerable<object> StartFoodPreparation(StartFoodPreparation order)
@@ -51,14 +65,31 @@ namespace Domain
             }
         }
 
+        private IEnumerable<object> SubmitOrder(SubmitOrder submitOrder)
+        {
+            return new[]
+            {
+                new OrderSubmitted()
+            };
+        }
+
+        public string Id { get; set; }
+
         public void Hydrate(object @event)
         {
+            if (@event is OrderCreated)
+                this.OnOrderCreated((OrderCreated)@event);
             if (@event is OrderSubmitted)
                 OnOrderSubmitted((OrderSubmitted) @event);
             if (@event is OrderStarted)
                 OnOrderStarted((OrderStarted) @event);
             if (@event is OrderPickedUp)
                 OnOrderPickedUp((OrderPickedUp) @event);
+        }
+
+        private void OnOrderCreated(OrderCreated @event)
+        {
+            orderId = @event.OrderId;
         }
 
         private void OnOrderStarted(OrderStarted @event)
@@ -77,6 +108,10 @@ namespace Domain
         }
     }
 
+    public class SubmitOrder
+    {
+    }
+
     public enum OrderStatus
     {
         None,
@@ -89,6 +124,7 @@ namespace Domain
 
     public class GetOrderStatus
     {
+
         public OrderStatus Status { get; set; }
 
         public void Apply(OrderSubmitted orderSubmitted)
@@ -117,8 +153,23 @@ namespace Domain
         }
     }
 
+    public class OrderStarted
+    {
+    }
+
+    public class OrderCreated
+    {
+        public string OrderId { get; }
+
+        public OrderCreated(string orderId)
+        {
+            this.OrderId = orderId;
+        }
+    }
+
     public class FoodDelivered
     {
+        
     }
 
     public class OrderPrepared
@@ -149,7 +200,7 @@ namespace Domain
     public class OrderCanceled
     {
     }
-
+    
     public class FinishOrder
     {
     }
@@ -157,7 +208,16 @@ namespace Domain
     public class OrderNotSubmittedException : Exception
     {
         public OrderNotSubmittedException(string message) : base(message)
+        { }
+    }
+
+    public class CreateOrder
+    {
+        public string OrderId { get; }
+
+        public CreateOrder(string orderId)
         {
+            this.OrderId = orderId;
         }
     }
 
@@ -183,10 +243,6 @@ namespace Domain
     }
 
     public class OrderPickedUp
-    {
-    }
-
-    public class OrderStarted
     {
     }
 
