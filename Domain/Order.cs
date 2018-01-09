@@ -145,9 +145,7 @@ namespace Domain
                 this.OnOrderCreated((OrderCreated) @event);
             if(@event is OrderSubmitted_V2)
                 OnOrderSubmitted_V2((OrderSubmitted_V2) @event);
-            if (@event is OrderSubmitted)
-                OnOrderSubmitted((OrderSubmitted) @event);
-            if (@event is OrderStarted)
+         if (@event is OrderStarted)
                 OnOrderStarted((OrderStarted) @event);
             if (@event is OrderPickedUp)
                 OnOrderPickedUp((OrderPickedUp) @event);
@@ -185,11 +183,6 @@ namespace Domain
         private void OnOrderPickedUp(OrderPickedUp @event)
         {
             Status = OrderStatus.PickedUp;
-        }
-
-        private void OnOrderSubmitted(OrderSubmitted @event)
-        {
-            Status = OrderStatus.Submitted;
         }
     }
 

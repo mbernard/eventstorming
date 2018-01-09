@@ -37,7 +37,7 @@ namespace TestProject1
         {
             //Given
             var order = new Order();
-            order.Hydrate(new OrderSubmitted());
+            order.Hydrate(new OrderSubmitted_V2());
 
             //When
             var events = order.Execute(new CancelOrder("1"));
@@ -267,6 +267,13 @@ namespace TestProject1
             
             Assert.True(events.Count() == 1);
             Assert.True(events.First() is ItemRemovedFromOrder);
+        }
+
+        [Test]
+        public void MappingSubmitOrderFromV1ToV2()
+        {
+            var order = new Order();
+            order.Hydrate(new OrderSubmitted());
         }
     }
 }
