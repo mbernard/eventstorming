@@ -138,11 +138,7 @@ namespace Domain
     public class OrderCanceled
     {
     }
-
-    public class OrderStarted
-    {
-    }
-
+    
     public class FinishOrder
     {
     }
