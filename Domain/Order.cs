@@ -274,6 +274,7 @@ namespace Domain
 
     public class OrderPickedUp
     {
+        public string OrderId { get; set; }
     }
 
     public class StartFoodPreparation

@@ -72,5 +72,25 @@ namespace TestProject1
             Assert.True(deliveryList.Deliveries.ElementAt(1).Value.Address == "5678 rue Justin, Mtl");
             Assert.True(deliveryList.Deliveries.ElementAt(1).Value.Status == OrderStatus.ReadyForPickup);
         }
+
+        [Test]
+        public void DeliveryList_When_OrderPickedUp()
+        {
+            //Given
+            var deliveryList = new DeliveryList();
+            deliveryList.Apply(new OrderSubmitted {OrderId = "3", Date = DateTime.Now, Address = "1234 rue Louis, Mtl"});
+            deliveryList.Apply(new OrderPrepared {OrderId = "3"});
+            deliveryList.Apply(new OrderSubmitted {OrderId = "5", Date = DateTime.Now, Address = "5678 rue Justin, Mtl"});
+            deliveryList.Apply(new OrderPrepared {OrderId = "5"});
+            deliveryList.Apply(new OrderCanceled {OrderId = "3"});
+            deliveryList.Apply(new OrderPickedUp {OrderId = "5"});
+            
+            //When
+            //Then
+            Assert.True(deliveryList.Deliveries.Count() == 1);
+            Assert.True(deliveryList.Deliveries.First().Key == "5");
+            Assert.True(deliveryList.Deliveries.First().Value.Address == "5678 rue Justin, Mtl");
+            Assert.True(deliveryList.Deliveries.First().Value.Status == OrderStatus.PickedUp);
+        }
     }
 }

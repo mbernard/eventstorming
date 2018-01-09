@@ -17,5 +17,15 @@ namespace Domain
         }
 
         public IDictionary<string, (string Address, OrderStatus Status)> Deliveries => _deliveries;
+
+        public void Apply(OrderCanceled orderCanceled)
+        {
+            _deliveries.Remove(orderCanceled.OrderId);
+        }
+
+        public void Apply(OrderPickedUp orderPickedUp)
+        {
+            _deliveries[orderPickedUp.OrderId] = (_deliveries[orderPickedUp.OrderId].Address, OrderStatus.PickedUp);
+        }
     }
 }
