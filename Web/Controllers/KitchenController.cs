@@ -22,21 +22,21 @@ namespace Web.Controllers
         public ActionResult StartOrderPreperation(string id)
         {
             MvcApplication.OutstandinOrders.Apply(new OrderStarted { OrderId = id });
-            return this.View("Index", MvcApplication.OutstandinOrders);
+            return this.RedirectToAction("List");
         }
 
         [HttpPost]
         public ActionResult FinishOrder(string id)
         {
             MvcApplication.OutstandinOrders.Apply(new OrderPrepared { OrderId = id });
-            return this.View("Index", MvcApplication.OutstandinOrders);
+            return this.RedirectToAction("List");
         }
 
         [HttpPost]
         public ActionResult CancelOrder(string id)
         {
             MvcApplication.OutstandinOrders.Apply(new OrderCanceled { OrderId = id });
-            return this.View("Index", MvcApplication.OutstandinOrders);
+            return this.RedirectToAction("List");
         }
     }
 }
