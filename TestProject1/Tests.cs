@@ -22,6 +22,31 @@ namespace TestProject1
             Assert.True(events.Count() == 1);
             Assert.True(events.First() is OrderCanceled);
         }
+
+        [Test]
+        public void CancelANonReceivedOrder()
+        {
+            //Given
+            var order = new Order();
+            
+            //When
+            IEnumerable<object> events = Enumerable.Empty<object>();
+            Exception caught = null;
+            try
+            {
+                events = order.Execute(new CancelOrder());
+            }
+            catch (Exception e)
+            {
+                caught = e;
+            }
+
+            //Then
+            Assert.True(!events.Any());
+            Assert.True(caught != null);
+            Assert.True(caught is OrderNotReceivedException);
+        }
+        
     }
 
     public class OrderCanceled
@@ -51,7 +76,7 @@ namespace TestProject1
         {
             if (!received)
             {
-                throw new Exception("Order not received.");
+                throw new OrderNotReceivedException("Order not received.");
             }
 
             return new[] {new OrderCanceled()};
@@ -69,6 +94,12 @@ namespace TestProject1
         {
             this.received = true;
         }
+    }
+
+    public class OrderNotReceivedException : Exception
+    {
+        public OrderNotReceivedException(string message) : base(message)
+        {}
     }
 
     public class CancelOrder
