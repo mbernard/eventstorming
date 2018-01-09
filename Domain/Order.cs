@@ -11,8 +11,6 @@ namespace Domain
         {
         }
 
-        private bool received;
-        private bool pickedUp;
         private OrderStatus Status;
         private string OrderId;
         private bool isPaid;
@@ -274,6 +272,8 @@ namespace Domain
 
         public string OrderId { get; }
     }
+
+
 
     public class OrderSubmitted
     {
