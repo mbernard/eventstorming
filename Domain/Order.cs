@@ -7,10 +7,15 @@ namespace Domain
 {
     public class Order : IAggregate
     {
-        private string orderId;
+        public Order(string id)
+        {
+            this.Id = id;
+        }
+
         private bool received;
         private bool pickedUp;
         private OrderStatus Status;
+        private string OrderId;
 
         public IEnumerable<object> Execute(object order)
         {
@@ -82,7 +87,7 @@ namespace Domain
 
         private void OnOrderCreated(OrderCreated @event)
         {
-            orderId = @event.OrderId;
+            this.OrderId = @event.OrderId;
         }
 
         private void OnOrderPickedUp(OrderPickedUp @event)
@@ -161,27 +166,6 @@ namespace Domain
 
     public class OrderPrepared
     {
-    }
-
-    public class OrderPerUser
-    {
-        public DateTime OrderDate { get; set; }
-
-        public decimal TotalPrice { get; set; }
-
-        public IList<(string Name, decimal Price)> Items { get; set; } = new List<(string, decimal)>();
-
-
-        public void Apply(ItemAddedToOrder itemAddedToOrder)
-        {
-            Items.Add((itemAddedToOrder.Name, itemAddedToOrder.Price));
-            TotalPrice += itemAddedToOrder.Price;
-        }
-
-        public void Apply(OrderSubmitted orderSubmitted)
-        {
-            OrderDate = orderSubmitted.Date;
-        }
     }
 
     public class OrderCanceled
