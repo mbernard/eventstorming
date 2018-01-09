@@ -51,6 +51,7 @@ namespace Domain
             {
                 new ItemAddedToOrder
                 {
+                    OrderId = this.OrderId,
                     Name = order.Name,
                     Price = order.Price
                 }
