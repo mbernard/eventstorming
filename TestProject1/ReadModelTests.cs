@@ -136,6 +136,27 @@ namespace TestProject1
             Assert.True(deliveryList.Deliveries.ElementAt(1).Value.Status == OrderStatus.ReadyForPickup);
         
         }
+
+        [Test]
+        public void Receipt_When_OrderPaidOnDelivery()
+        {
+            //Given
+            var receipt = new Receipt();
+            receipt.Apply(new OrderCreated("5"));
+            receipt.Apply(new ItemAddedToOrder {OrderId = "5", Name = "French Fries", Price = 1});
+            receipt.Apply(new ItemAddedToOrder {OrderId = "5", Name = "Poutine", Price = 2});
+            receipt.Apply(new ItemRemovedFromOrder {OrderId = "5", Name = "French Fries"});
+            receipt.Apply(new OrderPaidOnDelivery {OrderId = "5"});
+
+            //Then
+            Assert.True(receipt.Receipts.Count() == 1);
+            Assert.True(receipt.Receipts.First().Key == "5");
+            Assert.True(receipt.Receipts.First().Value.Status == "Paid");
+            Assert.True(receipt.Receipts.First().Value.Items.Count() == 1);
+            Assert.True(receipt.Receipts.First().Value.Items.First().Name == "Poutine");
+            Assert.True(receipt.Receipts.First().Value.Items.First().Price == 2);
+            Assert.True(receipt.Receipts.First().Value.Price == 2);
+        }
         
     }
 }
